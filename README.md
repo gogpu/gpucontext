@@ -17,7 +17,8 @@ go get github.com/gogpu/gpucontext
 ## Features
 
 - **DeviceProvider** — Interface for injecting GPU device and queue
-- **EventSource** — Interface for input events (keyboard, mouse, window)
+- **EventSource** — Interface for input events (keyboard, mouse, window, IME)
+- **IME Support** — Input Method Editor for CJK languages (Chinese, Japanese, Korean)
 - **Registry[T]** — Generic registry with priority-based backend selection
 - **WebGPU Types** — Device, Queue, Adapter, Surface interfaces (zero dependencies)
 
@@ -72,6 +73,36 @@ type App struct {
 
 func (app *App) OnKeyPress(fn func(gpucontext.Key, gpucontext.Modifiers)) {
     app.keyHandlers = append(app.keyHandlers, fn)
+}
+```
+
+### IME Support (CJK Input)
+
+`IMEState` and related interfaces enable Input Method Editor support for Chinese, Japanese, and Korean input:
+
+```go
+// In gogpu/ui - handle IME composition
+func (input *TextInput) AttachIME(source gpucontext.EventSource) {
+    source.OnIMECompositionStart(func() {
+        input.showCompositionWindow()
+    })
+
+    source.OnIMECompositionUpdate(func(state gpucontext.IMEState) {
+        // Show composition text with cursor
+        input.setCompositionText(state.CompositionText, state.CursorPos)
+    })
+
+    source.OnIMECompositionEnd(func(committed string) {
+        // Insert final text
+        input.insertText(committed)
+        input.hideCompositionWindow()
+    })
+}
+
+// Control IME position (for composition window placement)
+func (input *TextInput) Focus(controller gpucontext.IMEController) {
+    controller.SetIMEEnabled(true)
+    controller.SetIMEPosition(input.cursorX, input.cursorY)
 }
 ```
 

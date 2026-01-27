@@ -4,16 +4,21 @@
 
 `gpucontext` is the shared foundation for the [gogpu](https://github.com/gogpu) ecosystem, providing interfaces and utilities for GPU resource sharing without circular dependencies.
 
-## Current: v0.1.1
+## Current: v0.2.0
 
 **Status:** Released
 
 - DeviceProvider interface
-- EventSource interface
+- EventSource interface (with IME support)
 - Registry[T] generic
 - WebGPU type definitions
+- IME support for CJK input
 
-## Planned: v0.2.0
+## Previous: v0.1.1
+
+- Initial release with DeviceProvider, EventSource, Registry
+
+## Planned: v0.3.0
 
 **Focus:** Extended capabilities
 
@@ -24,7 +29,7 @@
 
 ## Future Considerations
 
-### v0.3.0 — Compute Support
+### v0.4.0 — Compute Support
 - ComputeProvider interface
 - WorkgroupLimits
 - Storage buffer types

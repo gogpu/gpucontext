@@ -65,6 +65,58 @@ type EventSource interface {
 
 	// OnFocus registers a callback for focus change.
 	OnFocus(func(focused bool))
+
+	// IME events for international text input
+
+	// OnIMECompositionStart registers a callback for when IME composition begins.
+	// This is called when the user starts typing in an IME (e.g., for CJK input).
+	OnIMECompositionStart(fn func())
+
+	// OnIMECompositionUpdate registers a callback for IME composition updates.
+	// Called during composition with the current state (preview text, cursor).
+	OnIMECompositionUpdate(fn func(state IMEState))
+
+	// OnIMECompositionEnd registers a callback for when IME composition ends.
+	// The committed parameter contains the final text that should be inserted.
+	OnIMECompositionEnd(fn func(committed string))
+}
+
+// IMEState represents the current state of the Input Method Editor.
+// This is used for CJK (Chinese, Japanese, Korean) and other complex text input.
+//
+// During IME composition, the user types phonetic characters that are converted
+// to ideographic characters. The IMEState contains the current preview text
+// and cursor information for rendering the composition inline.
+type IMEState struct {
+	// Composing indicates whether IME is currently in composition mode.
+	Composing bool
+
+	// CompositionText is the text currently being composed (e.g., pinyin for Chinese).
+	// This should be displayed inline at the cursor position with special styling.
+	CompositionText string
+
+	// CursorPos is the cursor position within the composition text.
+	CursorPos int
+
+	// SelectionStart is the start of the selection within the composition text.
+	// This is used for candidate selection in some IME systems.
+	SelectionStart int
+
+	// SelectionEnd is the end of the selection within the composition text.
+	SelectionEnd int
+}
+
+// IMEController allows widgets to control IME behavior.
+// This interface is typically implemented by the host window system.
+type IMEController interface {
+	// SetIMEPosition tells the platform where to show the IME candidate window.
+	// The coordinates are in screen pixels relative to the window.
+	SetIMEPosition(x, y int)
+
+	// SetIMEEnabled enables or disables IME for the current input context.
+	// When disabled, key presses are delivered directly without IME processing.
+	// This is useful for password fields or non-text inputs.
+	SetIMEEnabled(enabled bool)
 }
 
 // Key represents a keyboard key.
@@ -289,6 +341,15 @@ func (NullEventSource) OnResize(func(int, int)) {}
 
 // OnFocus does nothing.
 func (NullEventSource) OnFocus(func(bool)) {}
+
+// OnIMECompositionStart does nothing.
+func (NullEventSource) OnIMECompositionStart(func()) {}
+
+// OnIMECompositionUpdate does nothing.
+func (NullEventSource) OnIMECompositionUpdate(func(IMEState)) {}
+
+// OnIMECompositionEnd does nothing.
+func (NullEventSource) OnIMECompositionEnd(func(string)) {}
 
 // Ensure NullEventSource implements EventSource.
 var _ EventSource = NullEventSource{}

@@ -19,6 +19,11 @@ func TestNullEventSource(t *testing.T) {
 	es.OnScroll(func(float64, float64) {})
 	es.OnResize(func(int, int) {})
 	es.OnFocus(func(bool) {})
+
+	// IME methods should also be callable without panic
+	es.OnIMECompositionStart(func() {})
+	es.OnIMECompositionUpdate(func(IMEState) {})
+	es.OnIMECompositionEnd(func(string) {})
 }
 
 func TestModifiers(t *testing.T) {
@@ -83,4 +88,71 @@ func TestMouseButtonConstants(t *testing.T) {
 	if MouseButtonMiddle != 2 {
 		t.Error("MouseButtonMiddle should be 2")
 	}
+}
+
+func TestIMEState(t *testing.T) {
+	// Test IMEState struct fields
+	state := IMEState{
+		Composing:       true,
+		CompositionText: "nihao",
+		CursorPos:       5,
+		SelectionStart:  2,
+		SelectionEnd:    4,
+	}
+
+	if !state.Composing {
+		t.Error("Composing should be true")
+	}
+	if state.CompositionText != "nihao" {
+		t.Errorf("CompositionText = %q, want \"nihao\"", state.CompositionText)
+	}
+	if state.CursorPos != 5 {
+		t.Errorf("CursorPos = %d, want 5", state.CursorPos)
+	}
+	if state.SelectionStart != 2 {
+		t.Errorf("SelectionStart = %d, want 2", state.SelectionStart)
+	}
+	if state.SelectionEnd != 4 {
+		t.Errorf("SelectionEnd = %d, want 4", state.SelectionEnd)
+	}
+}
+
+func TestIMEStateZeroValue(t *testing.T) {
+	// Test IMEState zero value
+	var state IMEState
+
+	if state.Composing {
+		t.Error("Zero value Composing should be false")
+	}
+	if state.CompositionText != "" {
+		t.Errorf("Zero value CompositionText = %q, want empty", state.CompositionText)
+	}
+	if state.CursorPos != 0 {
+		t.Errorf("Zero value CursorPos = %d, want 0", state.CursorPos)
+	}
+	if state.SelectionStart != 0 {
+		t.Errorf("Zero value SelectionStart = %d, want 0", state.SelectionStart)
+	}
+	if state.SelectionEnd != 0 {
+		t.Errorf("Zero value SelectionEnd = %d, want 0", state.SelectionEnd)
+	}
+}
+
+// mockIMEController is used to verify IMEController interface at compile time.
+type mockIMEController struct{}
+
+func (mockIMEController) SetIMEPosition(_, _ int) {}
+func (mockIMEController) SetIMEEnabled(_ bool)    {}
+
+// Ensure mockIMEController implements IMEController.
+var _ IMEController = mockIMEController{}
+
+func TestIMEControllerInterface(t *testing.T) {
+	// Verify IMEController can be used through the interface
+	var controller IMEController = mockIMEController{}
+
+	// These should not panic
+	controller.SetIMEPosition(100, 200)
+	controller.SetIMEEnabled(true)
+	controller.SetIMEEnabled(false)
 }
