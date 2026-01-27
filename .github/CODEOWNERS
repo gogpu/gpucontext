@@ -1,0 +1,23 @@
+# CODEOWNERS for gpucontext
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything in the repo
+* @kolkov
+
+# Core interfaces - Breaking changes require careful review
+/device_provider.go @kolkov
+/events.go @kolkov
+/registry.go @kolkov
+/webgpu_types.go @kolkov
+
+# Documentation
+*.md @kolkov
+
+# GitHub configuration
+/.github/ @kolkov
+
+# Go module files
+/go.mod @kolkov
+
+# Tests
+*_test.go @kolkov
