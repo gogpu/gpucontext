@@ -1,2 +1,24 @@
+# IDE
 .idea/
 *.iml
+
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Logs
+*.log
+
+# Private dev docs (not committed)
+docs/dev/
+
+# AI settings
+.claude/
+.goda/
+.goco/
+.gode/
+
+tmp/
+.DS_Store

@@ -1,4 +1,9 @@
+// Copyright 2026 The gogpu Authors
+// SPDX-License-Identifier: BSD-3-Clause
+
 package gpucontext
+
+import "github.com/gogpu/gputypes"
 
 // DeviceProvider provides access to GPU device, queue, and related resources.
 // This interface enables dependency injection of GPU capabilities between
@@ -10,10 +15,17 @@ package gpucontext
 //
 // Example usage in gg:
 //
+//	import (
+//	    "github.com/gogpu/gpucontext"
+//	    "github.com/gogpu/gputypes"
+//	)
+//
 //	func NewGPUCanvas(provider gpucontext.DeviceProvider) *Canvas {
+//	    format := provider.SurfaceFormat() // returns gputypes.TextureFormat
 //	    return &Canvas{
 //	        device: provider.Device(),
 //	        queue:  provider.Queue(),
+//	        format: format,
 //	    }
 //	}
 type DeviceProvider interface {
@@ -26,9 +38,9 @@ type DeviceProvider interface {
 	Queue() Queue
 
 	// SurfaceFormat returns the preferred texture format for the surface.
-	// May return TextureFormatUndefined if no surface is attached (headless mode).
+	// May return gputypes.TextureFormatUndefined if no surface is attached (headless mode).
 	// This is useful for creating render targets that match the surface format.
-	SurfaceFormat() TextureFormat
+	SurfaceFormat() gputypes.TextureFormat
 
 	// Adapter returns the WebGPU adapter (optional, may be nil).
 	// The adapter provides information about the GPU capabilities.

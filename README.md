@@ -4,7 +4,16 @@ Shared GPU infrastructure for the [gogpu](https://github.com/gogpu) ecosystem.
 
 ## Overview
 
-`gpucontext` provides interfaces and utilities for sharing GPU resources across multiple packages without circular dependencies. It follows the pattern used by [wgpu-types](https://docs.rs/wgpu-types) in the Rust ecosystem.
+`gpucontext` provides interfaces and utilities for sharing GPU resources across multiple packages without circular dependencies.
+
+## Relationship to gputypes
+
+| Package | Purpose | Dependencies |
+|---------|---------|--------------|
+| [gputypes](https://github.com/gogpu/gputypes) | WebGPU types (enums, structs, constants) | **ZERO** |
+| **gpucontext** | Interfaces (DeviceProvider, EventSource, Texture) | imports gputypes |
+
+gpucontext imports gputypes to use shared types in interface signatures, ensuring type compatibility across the ecosystem.
 
 ## Installation
 
@@ -20,7 +29,8 @@ go get github.com/gogpu/gpucontext
 - **EventSource** — Interface for input events (keyboard, mouse, window, IME)
 - **IME Support** — Input Method Editor for CJK languages (Chinese, Japanese, Korean)
 - **Registry[T]** — Generic registry with priority-based backend selection
-- **WebGPU Types** — Device, Queue, Adapter, Surface interfaces (zero dependencies)
+- **WebGPU Interfaces** — Device, Queue, Adapter, Surface interfaces
+- **WebGPU Types** — Re-exports from [gputypes](https://github.com/gogpu/gputypes) (TextureFormat, etc.)
 
 ## Usage
 
@@ -142,16 +152,22 @@ names := backends.Available() // ["vulkan", "software"]
 ## Dependency Graph
 
 ```
+                   gputypes (ZERO deps)
+                 All WebGPU types (100+)
+                          │
+                          ▼
                    gpucontext
-                  (DeviceProvider, Registry, types)
-                       ^
-          +------------+------------+
-          |            |            |
-        gogpu         gg         born-ml/born
-        (implements)  (uses)     (implements & uses)
-          |
-          v
-        wgpu/hal
+                  (imports gputypes)
+                DeviceProvider, EventSource
+                          │
+          ┌───────────────┼───────────────┐
+          │               │               │
+          ▼               ▼               ▼
+        gogpu            gg          born-ml/born
+     (implements)      (uses)      (implements & uses)
+          │
+          ▼
+       wgpu/hal
 ```
 
 ## Ecosystem

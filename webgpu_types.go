@@ -3,40 +3,24 @@
 
 package gpucontext
 
-// WebGPU Type Definitions for Cross-Package Sharing
+// WebGPU Interface Definitions for Cross-Package Sharing
 //
-// This file defines interfaces and types that are implemented by wgpu/hal
+// This file defines interfaces that are implemented by wgpu/hal
 // and used by consumers like gg, gogpu, and born-ml.
 //
-// IMPORTANT: This package has ZERO dependencies to avoid circular imports.
-// All types here are interfaces that backends implement.
-
-// TextureFormat specifies the format of texture data.
-// Values match the WebGPU specification.
-type TextureFormat uint32
-
-// Common texture formats matching WebGPU spec.
-const (
-	TextureFormatUndefined      TextureFormat = 0
-	TextureFormatRGBA8Unorm     TextureFormat = 1
-	TextureFormatRGBA8UnormSrgb TextureFormat = 2
-	TextureFormatBGRA8Unorm     TextureFormat = 3
-	TextureFormatBGRA8UnormSrgb TextureFormat = 4
-	// Add more as needed - these are the most common
-)
+// Types (TextureFormat, BufferUsage, etc.) are in gputypes package.
+// Interfaces (Device, Queue, etc.) are defined here as behavioral contracts.
+//
+// Users should import both packages:
+//
+//	import (
+//	    "github.com/gogpu/gpucontext"
+//	    "github.com/gogpu/gputypes"
+//	)
 
 // Device represents a logical GPU device.
 // Implemented by wgpu/hal.Device.
 type Device interface {
-	// CreateBuffer creates a GPU buffer.
-	// CreateBuffer(descriptor BufferDescriptor) Buffer
-
-	// CreateTexture creates a GPU texture.
-	// CreateTexture(descriptor TextureDescriptor) Texture
-
-	// CreateShaderModule creates a shader module from source.
-	// CreateShaderModule(descriptor ShaderModuleDescriptor) ShaderModule
-
 	// Poll processes pending operations.
 	Poll(wait bool)
 
@@ -54,30 +38,30 @@ type Queue interface {
 	// WriteBuffer(buffer Buffer, offset uint64, data []byte)
 
 	// WriteTexture writes data to a texture.
-	// WriteTexture(destination ImageCopyTexture, data []byte, layout TextureDataLayout, size Extent3D)
+	// WriteTexture(destination gputypes.ImageCopyTexture, data []byte, layout gputypes.TextureDataLayout, size gputypes.Extent3D)
 }
 
 // Adapter represents a physical GPU.
 // Implemented by wgpu/hal.Adapter.
 type Adapter interface {
 	// RequestDevice requests a logical device from this adapter.
-	// RequestDevice(descriptor DeviceDescriptor) (Device, Queue, error)
+	// RequestDevice(descriptor gputypes.DeviceDescriptor) (Device, Queue, error)
 
 	// GetInfo returns information about this adapter.
-	// GetInfo() AdapterInfo
+	// GetInfo() gputypes.AdapterInfo
 
 	// Features returns the features supported by this adapter.
-	// Features() Features
+	// Features() gputypes.Features
 
 	// Limits returns the limits of this adapter.
-	// Limits() Limits
+	// Limits() gputypes.Limits
 }
 
 // Surface represents a rendering surface (window).
 // Implemented by wgpu/hal.Surface.
 type Surface interface {
 	// Configure configures the surface for rendering.
-	// Configure(device Device, config SurfaceConfiguration)
+	// Configure(device Device, config gputypes.SurfaceConfiguration)
 
 	// GetCurrentTexture gets the current texture for rendering.
 	// GetCurrentTexture() (SurfaceTexture, error)
@@ -93,7 +77,7 @@ type Instance interface {
 	// CreateSurface(descriptor SurfaceDescriptor) (Surface, error)
 
 	// RequestAdapter requests a GPU adapter.
-	// RequestAdapter(options RequestAdapterOptions) (Adapter, error)
+	// RequestAdapter(options gputypes.RequestAdapterOptions) (Adapter, error)
 
 	// EnumerateAdapters returns all available adapters.
 	// EnumerateAdapters() []Adapter
