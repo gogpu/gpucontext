@@ -4,21 +4,27 @@
 
 `gpucontext` is the shared foundation for the [gogpu](https://github.com/gogpu) ecosystem, providing interfaces and utilities for GPU resource sharing without circular dependencies.
 
-## Current: v0.2.0
+## Current: v0.3.1
 
 **Status:** Released
 
+- Import gputypes v0.2.0 (webgpu.h spec-compliant enums)
 - DeviceProvider interface
 - EventSource interface (with IME support)
 - Registry[T] generic
-- WebGPU type definitions
+
+## Released
+
+### v0.3.0 (2026-01-29)
+- Import gputypes for unified WebGPU types
+
+### v0.2.0 (2026-01-27)
 - IME support for CJK input
 
-## Previous: v0.1.1
-
+### v0.1.1 (2026-01-27)
 - Initial release with DeviceProvider, EventSource, Registry
 
-## Planned: v0.3.0
+## Planned: v0.4.0
 
 **Focus:** Extended capabilities
 
