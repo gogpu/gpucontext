@@ -4,8 +4,11 @@
 // projects to enable GPU resource sharing without circular dependencies:
 //
 //   - DeviceProvider: Interface for providing GPU device and queue
-//   - Registry[T]: Generic registry for backend implementations
-//   - Type aliases: Convenience re-exports from wgpu/types
+//   - EventSource: Interface for window/input events (keyboard, mouse)
+//   - TouchEventSource: Interface for touch input (multi-touch, gestures)
+//   - Texture: Minimal interface for GPU textures
+//   - TextureDrawer: Interface for drawing textures (2D rendering)
+//   - TextureCreator: Interface for creating textures from pixel data
 //
 // # Consumers
 //

@@ -1,5 +1,5 @@
 // Copyright 2026 The gogpu Authors
-// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-License-Identifier: MIT
 
 package gpucontext
 
@@ -28,11 +28,11 @@ func TestNullEventSource(t *testing.T) {
 
 func TestModifiers(t *testing.T) {
 	tests := []struct {
-		mods     Modifiers
-		shift    bool
-		control  bool
-		alt      bool
-		super    bool
+		mods    Modifiers
+		shift   bool
+		control bool
+		alt     bool
+		super   bool
 	}{
 		{0, false, false, false, false},
 		{ModShift, true, false, false, false},
