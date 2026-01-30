@@ -27,6 +27,8 @@ go get github.com/gogpu/gpucontext
 
 - **DeviceProvider** — Interface for injecting GPU device and queue
 - **EventSource** — Interface for input events (keyboard, mouse, window, IME)
+- **TouchEventSource** — Interface for multi-touch input (mobile, tablets, touchscreens)
+- **Texture** — Minimal interface for GPU textures with TextureDrawer/TextureCreator
 - **IME Support** — Input Method Editor for CJK languages (Chinese, Japanese, Korean)
 - **Registry[T]** — Generic registry with priority-based backend selection
 - **WebGPU Interfaces** — Device, Queue, Adapter, Surface interfaces
@@ -116,6 +118,110 @@ func (input *TextInput) Focus(controller gpucontext.IMEController) {
 }
 ```
 
+### Texture Interface
+
+`Texture` provides a minimal interface for GPU textures, enabling sharing between packages:
+
+```go
+// Texture is a minimal interface for GPU textures
+type Texture interface {
+    Width() int
+    Height() int
+}
+
+// TextureDrawer can draw textures (implemented by renderers)
+type TextureDrawer interface {
+    DrawTexture(tex Texture, x, y float32) error
+    DrawTextureEx(tex Texture, opts TextureDrawOptions) error
+}
+
+// TextureCreator can create textures from pixel data
+type TextureCreator interface {
+    CreateTexture(width, height int, pixels []byte) (Texture, error)
+}
+```
+
+Usage in integration packages:
+
+```go
+// In gg/integration/ggcanvas - creates textures from CPU canvas
+func (c *Canvas) Flush() (gpucontext.Texture, error) {
+    pixels := c.pixmap.Pix()
+    return c.creator.CreateTexture(c.width, c.height, pixels)
+}
+
+// In gogpu - implements TextureDrawer
+func (ctx *Context) DrawTexture(tex gpucontext.Texture, x, y float32) error {
+    return ctx.renderer.DrawTexture(tex, x, y)
+}
+```
+
+### Touch Input (Multi-touch Support)
+
+`TouchEventSource` enables multi-touch handling for mobile and tablet applications:
+
+```go
+// Touch phases follow platform conventions (iOS, Android, W3C)
+const (
+    TouchBegan     // First contact
+    TouchMoved     // Touch moved
+    TouchEnded     // Touch lifted
+    TouchCancelled // System interrupted
+)
+
+// TouchPoint represents a single touch contact
+type TouchPoint struct {
+    ID       TouchID   // Unique within session
+    X, Y     float64   // Position in logical pixels
+    Pressure *float32  // Optional: 0.0-1.0
+    Radius   *float32  // Optional: contact radius
+}
+
+// TouchEvent contains all touch information
+type TouchEvent struct {
+    Phase     TouchPhase    // Lifecycle stage
+    Changed   []TouchPoint  // Touches that triggered this event
+    All       []TouchPoint  // All active touches
+    Modifiers Modifiers     // Keyboard modifiers (Ctrl+drag, etc.)
+    Timestamp time.Duration // For velocity calculations
+}
+```
+
+Usage for gesture handling:
+
+```go
+// Implement pinch-to-zoom
+func (app *App) AttachTouchEvents(source gpucontext.EventSource) {
+    // Check if touch is supported
+    if tes, ok := source.(gpucontext.TouchEventSource); ok {
+        tes.OnTouch(func(ev gpucontext.TouchEvent) {
+            switch ev.Phase {
+            case gpucontext.TouchBegan:
+                app.startGesture(ev.Changed)
+            case gpucontext.TouchMoved:
+                if len(ev.All) == 2 {
+                    // Pinch gesture
+                    app.handlePinch(ev.All[0], ev.All[1])
+                } else if len(ev.All) == 1 {
+                    // Pan gesture
+                    app.handlePan(ev.All[0])
+                }
+            case gpucontext.TouchEnded, gpucontext.TouchCancelled:
+                app.endGesture()
+            }
+        })
+    }
+}
+
+// Calculate pinch distance
+func (app *App) handlePinch(t1, t2 gpucontext.TouchPoint) {
+    dx := t1.X - t2.X
+    dy := t1.Y - t2.Y
+    distance := math.Sqrt(dx*dx + dy*dy)
+    app.zoom = distance / app.initialPinchDistance
+}
+```
+
 ### Backend Registry
 
 The `Registry[T]` provides thread-safe registration with priority-based selection:
@@ -158,7 +264,8 @@ names := backends.Available() // ["vulkan", "software"]
                           ▼
                    gpucontext
                   (imports gputypes)
-                DeviceProvider, EventSource
+          DeviceProvider, EventSource, Texture
+              TouchEventSource, Registry
                           │
           ┌───────────────┼───────────────┐
           │               │               │
