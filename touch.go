@@ -6,7 +6,7 @@ package gpucontext
 import "time"
 
 // TouchID uniquely identifies a touch point within a touch session.
-// The ID remains constant from TouchBegan through TouchEnded/TouchCancelled.
+// The ID remains constant from TouchBegan through TouchEnded/TouchCanceled.
 // IDs may be reused after a touch ends.
 //
 // Design note: Using int for compatibility with both int32 (Android) and int64 (iOS).
@@ -16,7 +16,7 @@ type TouchID int
 // TouchPhase represents the lifecycle stage of a touch point.
 // These phases align with platform conventions:
 //   - Android: ACTION_DOWN/MOVE/UP/CANCEL
-//   - iOS: touchesBegan/Moved/Ended/Cancelled
+//   - iOS: touchesBegan/Moved/Ended/Canceled
 //   - W3C: touchstart/move/end/cancel
 type TouchPhase uint8
 
@@ -33,13 +33,13 @@ const (
 	// Sent once per touch point at the end of interaction.
 	TouchEnded
 
-	// TouchCancelled indicates the system interrupted the touch.
+	// TouchCanceled indicates the system interrupted the touch.
 	// This can happen when:
 	//   - The app loses focus
 	//   - A system gesture is recognized (e.g., swipe to home)
 	//   - The touch hardware reports an error
 	// Always handle cancellation to reset UI state properly.
-	TouchCancelled
+	TouchCanceled
 )
 
 // String returns the phase name for debugging.
@@ -51,8 +51,8 @@ func (p TouchPhase) String() string {
 		return "Moved"
 	case TouchEnded:
 		return "Ended"
-	case TouchCancelled:
-		return "Cancelled"
+	case TouchCanceled:
+		return "Canceled"
 	default:
 		return "Unknown"
 	}
@@ -103,7 +103,7 @@ type TouchPoint struct {
 //   - TouchBegan: Changed contains new touches, All contains all active touches
 //   - TouchMoved: Changed contains moved touches, All contains all active touches
 //   - TouchEnded: Changed contains lifted touches, All contains remaining touches
-//   - TouchCancelled: Changed contains cancelled touches, All may be empty
+//   - TouchCanceled: Changed contains canceled touches, All may be empty
 //
 // Example multi-touch pinch gesture processing:
 //
@@ -124,12 +124,12 @@ type TouchEvent struct {
 	// For TouchBegan: newly added touches
 	// For TouchMoved: touches that moved
 	// For TouchEnded: touches that were lifted
-	// For TouchCancelled: touches that were interrupted
+	// For TouchCanceled: touches that were interrupted
 	Changed []TouchPoint
 
 	// All contains all currently active touch points.
 	// Useful for multi-touch gestures that need to track all contacts.
-	// For TouchEnded/TouchCancelled, this excludes the Changed touches.
+	// For TouchEnded/TouchCanceled, this excludes the Changed touches.
 	All []TouchPoint
 
 	// Modifiers contains keyboard modifier state at the time of the event.
@@ -160,7 +160,7 @@ type TouchEventSource interface {
 	// Callback threading: Called on the main/UI thread.
 	// Callbacks should be fast and non-blocking.
 	//
-	// Touch events are delivered in order: Began -> Moved* -> Ended/Cancelled
+	// Touch events are delivered in order: Began -> Moved* -> Ended/Canceled
 	// Multi-touch events for simultaneous contacts are coalesced into single events.
 	OnTouch(fn func(TouchEvent))
 }
