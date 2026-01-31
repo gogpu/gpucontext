@@ -27,6 +27,8 @@ go get github.com/gogpu/gpucontext
 
 - **DeviceProvider** — Interface for injecting GPU device and queue
 - **EventSource** — Interface for input events (keyboard, mouse, window, IME)
+- **PointerEventSource** — W3C Pointer Events Level 3 (unified mouse/touch/pen)
+- **ScrollEventSource** — Scroll/wheel events with pixel/line/page modes
 - **TouchEventSource** — Interface for multi-touch input (mobile, tablets, touchscreens)
 - **Texture** — Minimal interface for GPU textures with TextureDrawer/TextureCreator
 - **IME Support** — Input Method Editor for CJK languages (Chinese, Japanese, Korean)
@@ -166,7 +168,7 @@ const (
     TouchBegan     // First contact
     TouchMoved     // Touch moved
     TouchEnded     // Touch lifted
-    TouchCancelled // System interrupted
+    TouchCanceled // System interrupted
 )
 
 // TouchPoint represents a single touch contact
@@ -206,7 +208,7 @@ func (app *App) AttachTouchEvents(source gpucontext.EventSource) {
                     // Pan gesture
                     app.handlePan(ev.All[0])
                 }
-            case gpucontext.TouchEnded, gpucontext.TouchCancelled:
+            case gpucontext.TouchEnded, gpucontext.TouchCanceled:
                 app.endGesture()
             }
         })
