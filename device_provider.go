@@ -47,7 +47,3 @@ type DeviceProvider interface {
 	// Some implementations may not expose the adapter.
 	Adapter() Adapter
 }
-
-// DeviceHandle is an alias for DeviceProvider for backward compatibility.
-// Deprecated: Use DeviceProvider instead.
-type DeviceHandle = DeviceProvider
