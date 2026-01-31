@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-01-31
+
+### Added
+
+- **W3C Pointer Events Level 3** for unified pointer input
+  - `PointerEvent` — unified mouse, touch, pen input with full W3C compliance
+  - `PointerEventType` — Down, Up, Move, Enter, Leave, Cancel
+  - `PointerType` — Mouse, Touch, Pen
+  - `Button` — Left, Middle, Right, X1, X2, Eraser
+  - `Buttons` — bitmask for tracking multiple pressed buttons
+  - `PointerEventSource` — interface for registering pointer callbacks
+  - `NullPointerEventSource` — no-op implementation
+
+- **Scroll Events** for mouse wheel and trackpad
+  - `ScrollEvent` — horizontal/vertical scroll with delta modes
+  - `ScrollDeltaMode` — Pixel, Line, Page modes
+  - `ScrollEventSource` — interface for registering scroll callbacks
+  - `NullScrollEventSource` — no-op implementation
+
+- **CI/CD Infrastructure**
+  - GitHub Actions workflow (build, test, lint on Linux/macOS/Windows)
+  - golangci-lint v2 configuration
+
+### Changed
+
+- **TouchCancelled → TouchCanceled** — US English spelling (misspell linter)
+- Removed unused `DeviceHandle` alias
+
+[0.5.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.5.0
+
 ## [0.4.0] - 2026-01-30
 
 ### Added
