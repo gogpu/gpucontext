@@ -30,7 +30,7 @@ go get github.com/gogpu/gpucontext
 - **PointerEventSource** — W3C Pointer Events Level 3 (unified mouse/touch/pen)
 - **ScrollEventSource** — Scroll/wheel events with pixel/line/page modes
 - **TouchEventSource** — Interface for multi-touch input (mobile, tablets, touchscreens)
-- **Texture** — Minimal interface for GPU textures with TextureDrawer/TextureCreator
+- **Texture** — Minimal interface for GPU textures with TextureUpdater/TextureDrawer/TextureCreator
 - **IME Support** — Input Method Editor for CJK languages (Chinese, Japanese, Korean)
 - **Registry[T]** — Generic registry with priority-based backend selection
 - **WebGPU Interfaces** — Device, Queue, Adapter, Surface interfaces
@@ -140,6 +140,17 @@ type TextureDrawer interface {
 // TextureCreator can create textures from pixel data
 type TextureCreator interface {
     CreateTexture(width, height int, pixels []byte) (Texture, error)
+}
+```
+
+### TextureUpdater (Dynamic Content)
+
+`TextureUpdater` enables efficient texture updates without recreating textures:
+
+```go
+// TextureUpdater updates existing texture pixel data
+type TextureUpdater interface {
+    UpdateData(data []byte) error
 }
 ```
 

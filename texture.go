@@ -22,6 +22,19 @@ type Texture interface {
 	Height() int
 }
 
+// TextureUpdater updates existing texture pixel data.
+// Use for dynamic content such as canvas rendering and video frames.
+//
+// Implementations:
+//   - gogpu.Texture implements TextureUpdater
+type TextureUpdater interface {
+	// UpdateData uploads new pixel data to the texture.
+	// Data must be exactly width * height * bytesPerPixel bytes (typically RGBA).
+	//
+	// Returns error if the texture has been destroyed or data size is invalid.
+	UpdateData(data []byte) error
+}
+
 // TextureDrawer provides texture drawing capabilities for 2D rendering.
 // This interface enables packages like ggcanvas to draw textures without
 // depending directly on gogpu, following the Dependency Inversion Principle.

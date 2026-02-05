@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-02-05
+
+### Added
+
+- **TextureUpdater interface** for updating existing texture pixel data ([gg#79](https://github.com/gogpu/gg/issues/79))
+  - `UpdateData(data []byte) error` — upload new pixel data to existing texture
+  - Enables proper error handling for dynamic content (canvas rendering, video frames)
+  - Implemented by `gogpu.Texture`
+
+## [0.6.0] - 2026-01-31
+
+### Added
+
+- **Gesture Events** for multi-touch gesture recognition ([#6](https://github.com/gogpu/gpucontext/pull/6))
+  - `GestureEvent` — Vello-style per-frame gesture deltas (zoom, rotation, translation)
+  - `GestureEventSource` — interface for registering gesture callbacks
+  - `NullGestureEventSource` — no-op implementation
+
 ## [0.5.0] - 2026-01-31
 
 ### Added
@@ -33,6 +51,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **TouchCancelled → TouchCanceled** — US English spelling (misspell linter)
 - Removed unused `DeviceHandle` alias
 
+[0.7.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.7.0
+[0.6.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.6.0
 [0.5.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.5.0
 
 ## [0.4.0] - 2026-01-30
