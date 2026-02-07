@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-02-06
+
+### Added
+
+- **WindowProvider interface** for window geometry and DPI integration
+  - `Size() (width, height int)` — window client area in physical pixels
+  - `ScaleFactor() float64` — DPI scale factor (1.0 = standard, 2.0 = Retina/HiDPI)
+  - `RequestRedraw()` — request a new frame in on-demand rendering mode
+  - `NullWindowProvider` — configurable defaults for testing and headless operation
+
+- **PlatformProvider interface** for OS integration features (optional)
+  - `ClipboardRead() (string, error)` — read text from system clipboard
+  - `ClipboardWrite(text string) error` — write text to system clipboard
+  - `SetCursor(cursor CursorShape)` — change mouse cursor shape
+  - `DarkMode() bool` — system dark mode detection
+  - `ReduceMotion() bool` — accessibility: reduced animation preference
+  - `HighContrast() bool` — accessibility: high contrast mode
+  - `FontScale() float32` — user's font size preference multiplier
+  - `NullPlatformProvider` — no-op defaults for testing
+
+- **CursorShape enum** with 12 standard cursor shapes
+  - Default, Pointer, Text, Crosshair, Move
+  - ResizeNS, ResizeEW, ResizeNWSE, ResizeNESW
+  - NotAllowed, Wait, None (hidden)
+  - `String()` method for debugging
+
+### Removed
+
+- **TouchEventSource interface** — replaced by PointerEventSource (W3C Pointer Events Level 3)
+  - `TouchID`, `TouchPhase`, `TouchPoint`, `TouchEvent` types removed
+  - `TouchEventSource` interface removed
+  - `NullTouchEventSource` removed
+  - Touch input is fully covered by `PointerEventSource` with `PointerType: Touch`
+  - W3C recommends Pointer Events over Touch Events (Touch Events is legacy)
+
+### Notes
+
+- PlatformProvider is **optional** — use type assertion on WindowProvider:
+  `if pp, ok := provider.(gpucontext.PlatformProvider); ok { ... }`
+- These interfaces enable UI frameworks to access host window and platform
+  capabilities without direct dependency on gogpu
+
 ## [0.7.0] - 2026-02-05
 
 ### Added
@@ -51,6 +93,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **TouchCancelled → TouchCanceled** — US English spelling (misspell linter)
 - Removed unused `DeviceHandle` alias
 
+[0.8.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.8.0
 [0.7.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.7.0
 [0.6.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.6.0
 [0.5.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.5.0
