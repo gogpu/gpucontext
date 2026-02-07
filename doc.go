@@ -5,8 +5,9 @@
 //
 //   - DeviceProvider: Interface for providing GPU device and queue
 //   - EventSource: Interface for window/input events (keyboard, mouse)
-//   - TouchEventSource: Interface for touch input (multi-touch, gestures)
-//   - PointerEventSource: Interface for unified pointer events (W3C Level 3)
+//   - PointerEventSource: Interface for unified pointer events (W3C Level 3, mouse+touch+pen)
+//   - WindowProvider: Interface for window geometry, DPI, and redraw requests
+//   - PlatformProvider: Interface for clipboard, cursor, dark mode, accessibility
 //   - ScrollEventSource: Interface for detailed scroll events
 //   - Texture: Minimal interface for GPU textures
 //   - TextureDrawer: Interface for drawing textures (2D rendering)

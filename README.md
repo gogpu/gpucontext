@@ -26,10 +26,12 @@ go get github.com/gogpu/gpucontext
 ## Features
 
 - **DeviceProvider** — Interface for injecting GPU device and queue
+- **WindowProvider** — Window geometry, DPI scale factor, and redraw requests
+- **PlatformProvider** — Clipboard, cursor, dark mode, and accessibility preferences
+- **CursorShape** — 12 standard cursor shapes (arrow, pointer, text, resize, etc.)
 - **EventSource** — Interface for input events (keyboard, mouse, window, IME)
 - **PointerEventSource** — W3C Pointer Events Level 3 (unified mouse/touch/pen)
 - **ScrollEventSource** — Scroll/wheel events with pixel/line/page modes
-- **TouchEventSource** — Interface for multi-touch input (mobile, tablets, touchscreens)
 - **Texture** — Minimal interface for GPU textures with TextureUpdater/TextureDrawer/TextureCreator
 - **IME Support** — Input Method Editor for CJK languages (Chinese, Japanese, Korean)
 - **Registry[T]** — Generic registry with priority-based backend selection
@@ -59,6 +61,54 @@ func NewGPUCanvas(provider gpucontext.DeviceProvider) *Canvas {
     return &Canvas{
         device: provider.Device(),
         queue:  provider.Queue(),
+    }
+}
+```
+
+### WindowProvider (for UI frameworks)
+
+The `WindowProvider` interface enables UI frameworks to query window dimensions and DPI:
+
+```go
+// In gogpu/ui - uses WindowProvider for layout
+func (ui *UI) Layout(wp gpucontext.WindowProvider) {
+    w, h := wp.Size()
+    scale := wp.ScaleFactor()
+    dpW := float64(w) / scale
+    dpH := float64(h) / scale
+    ui.root.Layout(dpW, dpH)
+}
+```
+
+### PlatformProvider (optional OS integration)
+
+`PlatformProvider` exposes clipboard, cursor, and system preferences.
+Not all hosts support it — use type assertion to check:
+
+```go
+// In gogpu/ui - cursor management
+func (ui *UI) UpdateCursor(provider gpucontext.WindowProvider) {
+    if pp, ok := provider.(gpucontext.PlatformProvider); ok {
+        pp.SetCursor(gpucontext.CursorPointer) // hand cursor
+    }
+}
+
+// In gogpu/ui - clipboard
+func (ui *UI) Paste(provider gpucontext.WindowProvider) {
+    if pp, ok := provider.(gpucontext.PlatformProvider); ok {
+        text, err := pp.ClipboardRead()
+        if err == nil {
+            ui.focused.InsertText(text)
+        }
+    }
+}
+
+// In gogpu/ui - theme detection
+func (ui *UI) DetectTheme(provider gpucontext.WindowProvider) {
+    if pp, ok := provider.(gpucontext.PlatformProvider); ok {
+        if pp.DarkMode() {
+            ui.SetTheme(DarkTheme)
+        }
     }
 }
 ```
@@ -169,72 +219,6 @@ func (ctx *Context) DrawTexture(tex gpucontext.Texture, x, y float32) error {
 }
 ```
 
-### Touch Input (Multi-touch Support)
-
-`TouchEventSource` enables multi-touch handling for mobile and tablet applications:
-
-```go
-// Touch phases follow platform conventions (iOS, Android, W3C)
-const (
-    TouchBegan     // First contact
-    TouchMoved     // Touch moved
-    TouchEnded     // Touch lifted
-    TouchCanceled // System interrupted
-)
-
-// TouchPoint represents a single touch contact
-type TouchPoint struct {
-    ID       TouchID   // Unique within session
-    X, Y     float64   // Position in logical pixels
-    Pressure *float32  // Optional: 0.0-1.0
-    Radius   *float32  // Optional: contact radius
-}
-
-// TouchEvent contains all touch information
-type TouchEvent struct {
-    Phase     TouchPhase    // Lifecycle stage
-    Changed   []TouchPoint  // Touches that triggered this event
-    All       []TouchPoint  // All active touches
-    Modifiers Modifiers     // Keyboard modifiers (Ctrl+drag, etc.)
-    Timestamp time.Duration // For velocity calculations
-}
-```
-
-Usage for gesture handling:
-
-```go
-// Implement pinch-to-zoom
-func (app *App) AttachTouchEvents(source gpucontext.EventSource) {
-    // Check if touch is supported
-    if tes, ok := source.(gpucontext.TouchEventSource); ok {
-        tes.OnTouch(func(ev gpucontext.TouchEvent) {
-            switch ev.Phase {
-            case gpucontext.TouchBegan:
-                app.startGesture(ev.Changed)
-            case gpucontext.TouchMoved:
-                if len(ev.All) == 2 {
-                    // Pinch gesture
-                    app.handlePinch(ev.All[0], ev.All[1])
-                } else if len(ev.All) == 1 {
-                    // Pan gesture
-                    app.handlePan(ev.All[0])
-                }
-            case gpucontext.TouchEnded, gpucontext.TouchCanceled:
-                app.endGesture()
-            }
-        })
-    }
-}
-
-// Calculate pinch distance
-func (app *App) handlePinch(t1, t2 gpucontext.TouchPoint) {
-    dx := t1.X - t2.X
-    dy := t1.Y - t2.Y
-    distance := math.Sqrt(dx*dx + dy*dy)
-    app.zoom = distance / app.initialPinchDistance
-}
-```
-
 ### Backend Registry
 
 The `Registry[T]` provides thread-safe registration with priority-based selection:
@@ -277,14 +261,15 @@ names := backends.Available() // ["vulkan", "software"]
                           ▼
                    gpucontext
                   (imports gputypes)
-          DeviceProvider, EventSource, Texture
-              TouchEventSource, Registry
+          DeviceProvider, WindowProvider,
+          PlatformProvider, EventSource,
+          Texture, PointerEventSource, Registry
                           │
           ┌───────────────┼───────────────┐
           │               │               │
           ▼               ▼               ▼
-        gogpu            gg          born-ml/born
-     (implements)      (uses)      (implements & uses)
+        gogpu            gg              ui
+     (implements)      (uses)         (uses)
           │
           ▼
        wgpu/hal
