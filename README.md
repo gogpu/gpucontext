@@ -26,6 +26,7 @@ go get github.com/gogpu/gpucontext
 ## Features
 
 - **DeviceProvider** — Interface for injecting GPU device and queue
+- **HalProvider** — Optional direct access to HAL device/queue for GPU accelerators
 - **WindowProvider** — Window geometry, DPI scale factor, and redraw requests
 - **PlatformProvider** — Clipboard, cursor, dark mode, and accessibility preferences
 - **CursorShape** — 12 standard cursor shapes (arrow, pointer, text, resize, etc.)
@@ -63,6 +64,26 @@ func NewGPUCanvas(provider gpucontext.DeviceProvider) *Canvas {
         queue:  provider.Queue(),
     }
 }
+```
+
+### HalProvider (for GPU accelerators)
+
+`HalProvider` is an optional interface on `DeviceProvider` that exposes low-level HAL types.
+This enables GPU accelerators (like gg's SDF pipeline) to share the host device without creating their own:
+
+```go
+// In gogpu/gg - GPU accelerator checks for HAL access
+func (a *SDFAccelerator) SetDeviceProvider(dp gpucontext.DeviceProvider) {
+    if hp, ok := dp.(gpucontext.HalProvider); ok {
+        device := hp.HalDevice().(hal.Device)
+        queue := hp.HalQueue().(hal.Queue)
+        a.initWithSharedDevice(device, queue)
+    }
+}
+
+// In gogpu/gogpu - implements HalProvider
+func (app *App) HalDevice() any { return app.halDevice }
+func (app *App) HalQueue() any  { return app.halQueue }
 ```
 
 ### WindowProvider (for UI frameworks)
@@ -261,9 +282,9 @@ names := backends.Available() // ["vulkan", "software"]
                           ▼
                    gpucontext
                   (imports gputypes)
-          DeviceProvider, WindowProvider,
-          PlatformProvider, EventSource,
-          Texture, PointerEventSource, Registry
+          DeviceProvider, HalProvider,
+          WindowProvider, PlatformProvider,
+          EventSource, Texture, Registry
                           │
           ┌───────────────┼───────────────┐
           │               │               │

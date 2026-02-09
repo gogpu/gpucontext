@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-02-10
+
+### Added
+
+- **HalProvider interface** for direct HAL device/queue access ([gg#95](https://github.com/gogpu/gg/issues/95))
+  - `HalDevice() any` — returns underlying HAL device for direct GPU access
+  - `HalQueue() any` — returns underlying HAL queue for direct GPU access
+  - Optional interface — use type assertion on DeviceProvider:
+    `if hp, ok := provider.(gpucontext.HalProvider); ok { ... }`
+  - Enables GPU accelerators (e.g., gg SDF pipeline) to share devices with host applications
+    without creating their own wgpu instance
+
 ## [0.8.0] - 2026-02-06
 
 ### Added
@@ -93,6 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **TouchCancelled → TouchCanceled** — US English spelling (misspell linter)
 - Removed unused `DeviceHandle` alias
 
+[0.9.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.9.0
 [0.8.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.8.0
 [0.7.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.7.0
 [0.6.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.6.0
