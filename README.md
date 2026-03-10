@@ -86,18 +86,26 @@ func (app *App) HalDevice() any { return app.halDevice }
 func (app *App) HalQueue() any  { return app.halQueue }
 ```
 
-### WindowProvider (for UI frameworks)
+### WindowProvider (for UI frameworks and rendering libraries)
 
-The `WindowProvider` interface enables UI frameworks to query window dimensions and DPI:
+The `WindowProvider` interface enables UI frameworks and rendering libraries to query
+window dimensions (logical points) and DPI scale factor:
 
 ```go
 // In gogpu/ui - uses WindowProvider for layout
 func (ui *UI) Layout(wp gpucontext.WindowProvider) {
-    w, h := wp.Size()
-    scale := wp.ScaleFactor()
-    dpW := float64(w) / scale
-    dpH := float64(h) / scale
-    ui.root.Layout(dpW, dpH)
+    w, h := wp.Size()           // logical points (DIP)
+    scale := wp.ScaleFactor()   // 2.0 on Retina
+    ui.root.Layout(w, h, scale)
+}
+
+// In gg/ggcanvas - auto-detects HiDPI from provider
+func New(provider gpucontext.DeviceProvider, w, h int) (*Canvas, error) {
+    scale := 1.0
+    if wp, ok := provider.(gpucontext.WindowProvider); ok {
+        scale = wp.ScaleFactor()
+    }
+    // allocate pixmap at physical resolution: w*scale x h*scale
 }
 ```
 

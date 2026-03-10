@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **WindowProvider.Size()** now documented as returning logical points (DIP) instead of physical pixels
+  - Aligns with gogpu RETINA refactor: `App.Size()` returns logical coordinates
+  - Physical pixel dimensions = `Size() * ScaleFactor()`
+  - `NullWindowProvider` fields W/H updated to logical points
+  - README examples updated for HiDPI-aware rendering pattern
+
 ## [0.9.0] - 2026-02-10
 
 ### Added
@@ -22,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **WindowProvider interface** for window geometry and DPI integration
-  - `Size() (width, height int)` — window client area in physical pixels
+  - `Size() (width, height int)` — window client area in logical points (DIP)
   - `ScaleFactor() float64` — DPI scale factor (1.0 = standard, 2.0 = Retina/HiDPI)
   - `RequestRedraw()` — request a new frame in on-demand rendering mode
   - `NullWindowProvider` — configurable defaults for testing and headless operation

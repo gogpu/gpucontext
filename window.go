@@ -5,33 +5,34 @@ package gpucontext
 
 // WindowProvider provides window geometry and DPI information.
 //
-// This interface enables UI frameworks (like gogpu/ui) to query window
-// dimensions and scale factor for layout calculations in density-independent
-// pixels (Dp), and to request redraws for on-demand rendering.
+// This interface enables UI frameworks (like gogpu/ui) and rendering
+// libraries (like gg/ggcanvas) to query window dimensions and scale factor
+// for HiDPI-aware layout and rendering.
+//
+// Size() returns logical points (DIP — density-independent pixels).
+// To get physical pixel dimensions, multiply by ScaleFactor():
+//
+//	physW := int(float64(w) * scale)
 //
 // Implementations:
 //   - gogpu.App implements WindowProvider via platform window
+//   - gogpu.gpuContextAdapter implements WindowProvider (returned by GPUContextProvider)
 //   - NullWindowProvider provides configurable defaults for testing
 //
-// Example usage in a UI framework:
+// Example usage:
 //
 //	func (ui *UI) Layout(wp gpucontext.WindowProvider) {
-//	    w, h := wp.Size()
-//	    scale := wp.ScaleFactor()
-//	    dpW := float64(w) / scale
-//	    dpH := float64(h) / scale
-//	    ui.root.Layout(dpW, dpH)
+//	    w, h := wp.Size()           // logical points
+//	    scale := wp.ScaleFactor()   // 2.0 on Retina
+//	    ui.root.Layout(w, h, scale)
 //	}
-//
-// Note: This interface is designed for gogpu <-> ui integration.
-// The rendering library (gg) does NOT use this interface.
 type WindowProvider interface {
-	// Size returns the current window client area dimensions in physical pixels.
+	// Size returns the current window client area dimensions in logical points (DIP).
+	// On HiDPI displays, multiply by ScaleFactor() to get physical pixel dimensions.
 	Size() (width, height int)
 
 	// ScaleFactor returns the DPI scale factor.
 	// 1.0 = standard (96 DPI on Windows, 72 on macOS), 2.0 = Retina/HiDPI.
-	// Used to convert between physical pixels and density-independent pixels (Dp).
 	ScaleFactor() float64
 
 	// RequestRedraw requests the host to render a new frame.
@@ -48,13 +49,13 @@ type WindowProvider interface {
 // Example:
 //
 //	wp := gpucontext.NullWindowProvider{W: 800, H: 600, SF: 2.0}
-//	w, h := wp.Size()       // 800, 600
+//	w, h := wp.Size()       // 800, 600 (logical points)
 //	scale := wp.ScaleFactor() // 2.0
 type NullWindowProvider struct {
-	// W is the window width in physical pixels.
+	// W is the window width in logical points (DIP).
 	W int
 
-	// H is the window height in physical pixels.
+	// H is the window height in logical points (DIP).
 	H int
 
 	// SF is the DPI scale factor. When zero, ScaleFactor returns 1.0.
