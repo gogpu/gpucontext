@@ -7,7 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-03-15
+
+### Removed
+
+- **HalProvider interface DELETED** — `HalDevice() any` and `HalQueue() any` removed entirely.
+  Replaced by typed pattern: `provider.Device()` returns `gpucontext.Device`, consumers
+  type-assert to `*wgpu.Device` for full API access. Zero `any` in the device provider chain.
+  Go "accept interfaces, return structs" pattern.
+
 ### Changed
+
+- **Device, Queue, Adapter, Surface, Instance** interfaces in webgpu_types.go converted to
+  minimal type-token interfaces. Enables implicit Go interface satisfaction — `*wgpu.Device`
+  implements `gpucontext.Device` without gpucontext importing wgpu.
 
 - **WindowProvider.Size()** now documented as returning logical points (DIP) instead of physical pixels
   - Aligns with gogpu RETINA refactor: `App.Size()` returns logical coordinates

@@ -25,8 +25,7 @@ go get github.com/gogpu/gpucontext
 
 ## Features
 
-- **DeviceProvider** — Interface for injecting GPU device and queue
-- **HalProvider** — Optional direct access to HAL device/queue for GPU accelerators
+- **DeviceProvider** — Interface for injecting GPU device and queue (typed, zero `any`)
 - **WindowProvider** — Window geometry, DPI scale factor, and redraw requests
 - **PlatformProvider** — Clipboard, cursor, dark mode, and accessibility preferences
 - **CursorShape** — 12 standard cursor shapes (arrow, pointer, text, resize, etc.)
@@ -66,25 +65,25 @@ func NewGPUCanvas(provider gpucontext.DeviceProvider) *Canvas {
 }
 ```
 
-### HalProvider (for GPU accelerators)
+### Device Sharing (typed, zero `any`)
 
-`HalProvider` is an optional interface on `DeviceProvider` that exposes low-level HAL types.
-This enables GPU accelerators (like gg's SDF pipeline) to share the host device without creating their own:
+GPU accelerators (like gg's SDF pipeline) share the host device via typed interfaces:
 
 ```go
-// In gogpu/gg - GPU accelerator checks for HAL access
+// Consumer gets typed device from provider
 func (a *SDFAccelerator) SetDeviceProvider(dp gpucontext.DeviceProvider) {
-    if hp, ok := dp.(gpucontext.HalProvider); ok {
-        device := hp.HalDevice().(hal.Device)
-        queue := hp.HalQueue().(hal.Queue)
-        a.initWithSharedDevice(device, queue)
+    dev := dp.Device()                    // gpucontext.Device (minimal interface)
+    wgpuDev, ok := dev.(*wgpu.Device)     // type assert for full wgpu API
+    if ok {
+        a.initWithSharedDevice(wgpuDev)
     }
 }
-
-// In gogpu/gogpu - implements HalProvider
-func (app *App) HalDevice() any { return app.halDevice }
-func (app *App) HalQueue() any  { return app.halQueue }
 ```
+
+The pattern follows Go's "accept interfaces, return structs":
+- `gpucontext.Device` — minimal interface (type token)
+- `*wgpu.Device` — concrete type, satisfies `gpucontext.Device` implicitly
+- Consumer type-asserts when it needs the full API
 
 ### WindowProvider (for UI frameworks and rendering libraries)
 
@@ -290,7 +289,7 @@ names := backends.Available() // ["vulkan", "software"]
                           ▼
                    gpucontext
                   (imports gputypes)
-          DeviceProvider, HalProvider,
+          DeviceProvider,
           WindowProvider, PlatformProvider,
           EventSource, Texture, Registry
                           │
