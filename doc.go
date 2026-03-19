@@ -9,6 +9,7 @@
 //   - WindowProvider: Interface for window geometry, DPI, and redraw requests
 //   - PlatformProvider: Interface for clipboard, cursor, dark mode, accessibility
 //   - ScrollEventSource: Interface for detailed scroll events
+//   - WindowChrome: Interface for custom window chrome (frameless windows)
 //   - Texture: Minimal interface for GPU textures
 //   - TextureDrawer: Interface for drawing textures (2D rendering)
 //   - TextureCreator: Interface for creating textures from pixel data
