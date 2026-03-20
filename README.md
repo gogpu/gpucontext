@@ -11,7 +11,7 @@ Shared GPU infrastructure for the [gogpu](https://github.com/gogpu) ecosystem.
 | Package | Purpose | Dependencies |
 |---------|---------|--------------|
 | [gputypes](https://github.com/gogpu/gputypes) | WebGPU types (enums, structs, constants) | **ZERO** |
-| **gpucontext** | Interfaces (DeviceProvider, EventSource, Texture) | imports gputypes |
+| **gpucontext** | Interfaces (DeviceProvider, EventSource, WindowChrome, Texture) | imports gputypes |
 
 gpucontext imports gputypes to use shared types in interface signatures, ensuring type compatibility across the ecosystem.
 
@@ -34,6 +34,7 @@ go get github.com/gogpu/gpucontext
 - **ScrollEventSource** — Scroll/wheel events with pixel/line/page modes
 - **Texture** — Minimal interface for GPU textures with TextureUpdater/TextureDrawer/TextureCreator
 - **IME Support** — Input Method Editor for CJK languages (Chinese, Japanese, Korean)
+- **WindowChrome** — Custom window chrome for frameless windows (hit testing, minimize/maximize/close)
 - **Registry[T]** — Generic registry with priority-based backend selection
 - **WebGPU Interfaces** — Device, Queue, Adapter, Surface interfaces
 - **WebGPU Types** — Re-exports from [gputypes](https://github.com/gogpu/gputypes) (TextureFormat, etc.)
@@ -247,6 +248,31 @@ func (ctx *Context) DrawTexture(tex gpucontext.Texture, x, y float32) error {
 }
 ```
 
+### WindowChrome (frameless windows)
+
+`WindowChrome` enables custom window chrome for frameless windows with custom title bars:
+
+```go
+// In gogpu/ui - custom title bar with hit testing
+func (ui *UI) SetupFramelessWindow(provider gpucontext.WindowProvider) {
+    if wc, ok := provider.(gpucontext.WindowChrome); ok {
+        wc.SetFrameless(true)
+        wc.SetHitTestCallback(func(x, y float64) gpucontext.HitTestResult {
+            if y < 40 { // title bar height
+                return gpucontext.HitTestCaption // enables window dragging
+            }
+            return gpucontext.HitTestClient
+        })
+    }
+}
+
+// Window controls
+wc.Minimize()
+wc.Maximize()       // toggles maximized/restored
+wc.IsMaximized()    // for button icon state
+wc.Close()
+```
+
 ### Backend Registry
 
 The `Registry[T]` provides thread-safe registration with priority-based selection:
@@ -289,7 +315,7 @@ names := backends.Available() // ["vulkan", "software"]
                           ▼
                    gpucontext
                   (imports gputypes)
-          DeviceProvider,
+          DeviceProvider, WindowChrome,
           WindowProvider, PlatformProvider,
           EventSource, Texture, Registry
                           │
