@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-03-20
+
+### Added
+
+- **WindowChrome interface** for custom window chrome (frameless windows)
+  - `SetFrameless(bool)` / `IsFrameless() bool` — enable/disable frameless mode
+  - `SetHitTestCallback(HitTestCallback)` — custom hit testing for drag, resize, buttons
+  - `Minimize()` / `Maximize()` / `IsMaximized() bool` / `Close()` — window controls
+  - Optional interface — use type assertion:
+    `if wc, ok := provider.(gpucontext.WindowChrome); ok { ... }`
+
+- **HitTestResult enum** (13 values) for custom window regions
+  - `HitTestClient` — normal content area
+  - `HitTestCaption` — title bar drag area
+  - `HitTestClose` / `HitTestMaximize` / `HitTestMinimize` — window buttons
+  - `HitTestResizeN/S/W/E/NW/NE/SW/SE` — 8 resize edges/corners
+  - `String()` method for debugging
+
+- **HitTestCallback type** — `func(x, y float64) HitTestResult`
+
+- **NullWindowChrome** — no-op implementation for testing
+
 ## [0.10.0] - 2026-03-15
 
 ### Removed
@@ -128,6 +150,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **TouchCancelled → TouchCanceled** — US English spelling (misspell linter)
 - Removed unused `DeviceHandle` alias
 
+[0.11.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.11.0
+[0.10.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.10.0
 [0.9.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.9.0
 [0.8.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.8.0
 [0.7.0]: https://github.com/gogpu/gpucontext/releases/tag/v0.7.0
