@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-04-09
+
+### Added
+
+- **CursorMode** — `CursorNormal`, `CursorLocked`, `CursorConfined` constants for mouse grab / pointer lock.
+  Matches SDL `SDL_SetRelativeMouseMode` and `SDL_SetWindowMouseGrab` semantics. (gogpu#173)
+- **PointerEvent.DeltaX/DeltaY** — relative mouse movement fields for locked cursor mode.
+  Non-zero only when cursor is locked (FPS mouselook). Follows W3C Pointer Events pattern.
+
 ## [0.11.0] - 2026-03-20
 
 ### Added

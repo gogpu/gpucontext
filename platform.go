@@ -135,6 +135,42 @@ func (c CursorShape) String() string {
 	}
 }
 
+// CursorMode controls how the mouse cursor behaves within the window.
+//
+// This follows the pattern established by SDL_SetRelativeMouseMode and
+// SDL_SetWindowMouseGrab, providing three modes that cover the common
+// use cases for games and interactive applications.
+type CursorMode int
+
+const (
+	// CursorModeNormal is the default mode: cursor is visible and moves freely.
+	CursorModeNormal CursorMode = iota
+
+	// CursorModeLocked hides the cursor and confines it to the window.
+	// Mouse movement is reported as relative deltas (DeltaX/DeltaY on PointerEvent).
+	// The cursor is warped to the window center on each frame.
+	// Equivalent to SDL_SetRelativeMouseMode(SDL_TRUE).
+	CursorModeLocked
+
+	// CursorModeConfined keeps the cursor visible but confines it to the window bounds.
+	// Equivalent to SDL_SetWindowMouseGrab(SDL_TRUE).
+	CursorModeConfined
+)
+
+// String returns the cursor mode name for debugging.
+func (m CursorMode) String() string {
+	switch m {
+	case CursorModeNormal:
+		return "Normal"
+	case CursorModeLocked:
+		return "Locked"
+	case CursorModeConfined:
+		return "Confined"
+	default:
+		return "Unknown"
+	}
+}
+
 // NullPlatformProvider implements PlatformProvider with no-op behavior.
 // Used for testing and platforms without OS integration.
 //
