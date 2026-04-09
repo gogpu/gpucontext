@@ -105,6 +105,15 @@ type PointerEvent struct {
 	// Modifiers contains the keyboard modifier state at event time.
 	Modifiers Modifiers
 
+	// DeltaX is the relative horizontal movement in logical pixels.
+	// Non-zero only when CursorModeLocked is active; zero otherwise.
+	// Use for first-person camera, drag, and other relative-motion input.
+	DeltaX float64
+
+	// DeltaY is the relative vertical movement in logical pixels.
+	// Non-zero only when CursorModeLocked is active; zero otherwise.
+	DeltaY float64
+
 	// Timestamp is the event time as duration since an arbitrary reference.
 	// Useful for calculating velocities and detecting double-clicks.
 	// Zero if timestamps are not available on the platform.
