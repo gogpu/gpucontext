@@ -2,4 +2,4 @@ module github.com/gogpu/gpucontext
 
 go 1.25
 
-require github.com/gogpu/gputypes v0.2.0
+require github.com/gogpu/gputypes v0.5.0

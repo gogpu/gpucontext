@@ -32,7 +32,7 @@ go get github.com/gogpu/gpucontext
 - **EventSource** — Interface for input events (keyboard, mouse, window, IME)
 - **PointerEventSource** — W3C Pointer Events Level 3 (unified mouse/touch/pen)
 - **ScrollEventSource** — Scroll/wheel events with pixel/line/page modes
-- **Texture** — Minimal interface for GPU textures with TextureUpdater/TextureDrawer/TextureCreator
+- **Texture** — Minimal interface for GPU textures with TextureUpdater/TextureRegionUpdater/TextureDrawer/TextureCreator
 - **IME Support** — Input Method Editor for CJK languages (Chinese, Japanese, Korean)
 - **WindowChrome** — Custom window chrome for frameless windows (hit testing, minimize/maximize/close)
 - **Registry[T]** — Generic registry with priority-based backend selection
@@ -227,11 +227,18 @@ type TextureCreator interface {
 `TextureUpdater` enables efficient texture updates without recreating textures:
 
 ```go
-// TextureUpdater updates existing texture pixel data
+// TextureUpdater updates existing texture pixel data (full upload)
 type TextureUpdater interface {
     UpdateData(data []byte) error
 }
+
+// TextureRegionUpdater uploads only a sub-rectangle (partial upload)
+type TextureRegionUpdater interface {
+    UpdateRegion(x, y, w, h int, data []byte) error
+}
 ```
+
+`TextureRegionUpdater` enables incremental rendering — only dirty regions are uploaded to GPU instead of the full texture. For a 1080p@2x window, this reduces upload from ~33MB to a few KB per frame when only a small widget changes.
 
 Usage in integration packages:
 

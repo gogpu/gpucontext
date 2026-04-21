@@ -35,6 +35,23 @@ type TextureUpdater interface {
 	UpdateData(data []byte) error
 }
 
+// TextureRegionUpdater uploads a sub-rectangle of pixel data to the texture.
+// Use for incremental rendering where only a small portion of the texture
+// changes per frame (e.g., dirty region upload).
+//
+// Implementations:
+//   - gogpu.Texture implements TextureRegionUpdater
+type TextureRegionUpdater interface {
+	// UpdateRegion uploads a sub-rectangle of pixel data to the texture.
+	// x, y is the top-left corner of the region in the texture.
+	// w, h is the size of the region.
+	// data must be exactly w * h * bytesPerPixel bytes (densely packed RGBA rows).
+	//
+	// Returns error if the region exceeds texture bounds, data size is invalid,
+	// or the texture has been destroyed.
+	UpdateRegion(x, y, w, h int, data []byte) error
+}
+
 // TextureDrawer provides texture drawing capabilities for 2D rendering.
 // This interface enables packages like ggcanvas to draw textures without
 // depending directly on gogpu, following the Dependency Inversion Principle.
