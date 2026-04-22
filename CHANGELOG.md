@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] - 2026-04-22
+
+### Added
+
+- **TextureView** type token interface — enables type-safe render target passing between packages without importing wgpu. Follows existing Device/Queue/Surface/Instance pattern. Used by gg `GPURenderTarget.View` for per-pass render target selection (WebGPU spec alignment).
+
 ## [0.13.0] - 2026-04-21
 
 ### Added

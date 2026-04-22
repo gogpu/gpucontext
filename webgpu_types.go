@@ -57,6 +57,12 @@ type Adapter interface{}
 // to the concrete type (e.g., *wgpu.Surface).
 type Surface interface{}
 
+// TextureView is a type token for a GPU texture view.
+// Used as render target in render pass descriptors and for
+// direct surface rendering. Consumers that need the full API
+// should type-assert to the concrete type (e.g., *wgpu.TextureView).
+type TextureView interface{}
+
 // Instance is a type token for the GPU instance entry point.
 // Consumers that need the full instance API should type-assert
 // to the concrete type (e.g., *wgpu.Instance).
