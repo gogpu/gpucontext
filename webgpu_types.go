@@ -12,6 +12,10 @@ package gpucontext
 // Concrete types (e.g., *wgpu.Device) satisfy these empty interfaces implicitly.
 // Consumers type-assert to the concrete type when they need the full API.
 //
+// Note: TextureView and CommandEncoder are opaque handle structs (not interfaces),
+// defined in handle.go. They use unsafe.Pointer for compile-time type safety
+// without boxing allocations (ADR-018).
+//
 // Types (TextureFormat, BufferUsage, etc.) are in the gputypes package.
 //
 // Usage:
@@ -57,11 +61,8 @@ type Adapter interface{}
 // to the concrete type (e.g., *wgpu.Surface).
 type Surface interface{}
 
-// TextureView is a type token for a GPU texture view.
-// Used as render target in render pass descriptors and for
-// direct surface rendering. Consumers that need the full API
-// should type-assert to the concrete type (e.g., *wgpu.TextureView).
-type TextureView interface{}
+// TextureView is now a type-safe opaque handle struct defined in handle.go.
+// See NewTextureView, TextureView.Pointer, TextureView.IsNil.
 
 // Instance is a type token for the GPU instance entry point.
 // Consumers that need the full instance API should type-assert

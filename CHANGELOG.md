@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.0] - 2026-04-25
+
+### Changed
+
+- **TextureView** — replaced `interface{}` token with `struct{ ptr unsafe.Pointer }` opaque handle
+  (ADR-018, Vulkan/Ebitengine/Go Protobuf Opaque pattern). Compile-time type safety: TextureView
+  cannot be confused with CommandEncoder or other resource types. 8 bytes, value type, zero allocations.
+  GC-safe (unsafe.Pointer keeps object alive per Go spec). Breaking: callers must use
+  `NewTextureView(unsafe.Pointer(ptr))` and `tv.Pointer()` / `tv.IsNil()` instead of direct assignment.
+
+### Added
+
+- **CommandEncoder** opaque handle — same pattern as TextureView. Used for the shared encoder
+  pipeline (ADR-017). `NewCommandEncoder()`, `Pointer()`, `IsNil()`.
+
 ## [0.14.0] - 2026-04-22
 
 ### Added
