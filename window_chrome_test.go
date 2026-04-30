@@ -14,6 +14,9 @@ func TestNullWindowChrome_Defaults(t *testing.T) {
 	if wc.IsMaximized() {
 		t.Error("IsMaximized() should return false")
 	}
+	if wc.IsFullscreen() {
+		t.Error("IsFullscreen() should return false")
+	}
 }
 
 func TestNullWindowChrome_Actions(t *testing.T) {
@@ -26,6 +29,8 @@ func TestNullWindowChrome_Actions(t *testing.T) {
 	wc.SetHitTestCallback(nil)
 	wc.Minimize()
 	wc.Maximize()
+	wc.SetFullscreen(true)
+	wc.SetFullscreen(false)
 	wc.Close()
 }
 
@@ -104,11 +109,12 @@ func TestHitTestResult_Values(t *testing.T) {
 
 // mockWindowChrome verifies the interface can be implemented by custom types.
 type mockWindowChrome struct {
-	frameless bool
-	maximized bool
-	closed    bool
-	minimized bool
-	callback  HitTestCallback
+	frameless  bool
+	maximized  bool
+	fullscreen bool
+	closed     bool
+	minimized  bool
+	callback   HitTestCallback
 }
 
 func (m *mockWindowChrome) SetFrameless(frameless bool)           { m.frameless = frameless }
@@ -117,6 +123,8 @@ func (m *mockWindowChrome) SetHitTestCallback(cb HitTestCallback) { m.callback =
 func (m *mockWindowChrome) Minimize()                             { m.minimized = true }
 func (m *mockWindowChrome) Maximize()                             { m.maximized = !m.maximized }
 func (m *mockWindowChrome) IsMaximized() bool                     { return m.maximized }
+func (m *mockWindowChrome) SetFullscreen(fullscreen bool)         { m.fullscreen = fullscreen }
+func (m *mockWindowChrome) IsFullscreen() bool                    { return m.fullscreen }
 func (m *mockWindowChrome) Close()                                { m.closed = true }
 
 // Ensure mockWindowChrome implements WindowChrome.
@@ -174,6 +182,16 @@ func TestWindowChrome_CustomImplementation(t *testing.T) {
 	wc.Maximize()
 	if wc.IsMaximized() {
 		t.Error("IsMaximized() should return false after second Maximize()")
+	}
+
+	// Test fullscreen
+	wc.SetFullscreen(true)
+	if !wc.IsFullscreen() {
+		t.Error("IsFullscreen() should return true after SetFullscreen(true)")
+	}
+	wc.SetFullscreen(false)
+	if wc.IsFullscreen() {
+		t.Error("IsFullscreen() should return false after SetFullscreen(false)")
 	}
 
 	// Test close

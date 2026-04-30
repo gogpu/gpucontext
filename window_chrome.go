@@ -145,6 +145,16 @@ type WindowChrome interface {
 	// IsMaximized returns true if the window is currently maximized.
 	IsMaximized() bool
 
+	// SetFullscreen enters or exits fullscreen mode.
+	// On Windows: borderless fullscreen (Chromium pattern).
+	// On macOS: native toggleFullScreen with animation.
+	// On X11: _NET_WM_STATE_FULLSCREEN.
+	// On Wayland: xdg_toplevel.set_fullscreen / unset_fullscreen.
+	SetFullscreen(fullscreen bool)
+
+	// IsFullscreen returns true if the window is currently in fullscreen mode.
+	IsFullscreen() bool
+
 	// Close requests the window to close.
 	// This triggers the normal close flow (close events, cleanup).
 	Close()
@@ -156,6 +166,7 @@ type WindowChrome interface {
 // Default return values:
 //   - IsFrameless: false
 //   - IsMaximized: false
+//   - IsFullscreen: false
 //   - All actions: no-op
 type NullWindowChrome struct{}
 
@@ -176,6 +187,12 @@ func (NullWindowChrome) Maximize() {}
 
 // IsMaximized returns false.
 func (NullWindowChrome) IsMaximized() bool { return false }
+
+// SetFullscreen does nothing.
+func (NullWindowChrome) SetFullscreen(bool) {}
+
+// IsFullscreen returns false.
+func (NullWindowChrome) IsFullscreen() bool { return false }
 
 // Close does nothing.
 func (NullWindowChrome) Close() {}
