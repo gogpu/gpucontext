@@ -34,7 +34,7 @@ go get github.com/gogpu/gpucontext
 - **ScrollEventSource** — Scroll/wheel events with pixel/line/page modes
 - **Texture** — Minimal interface for GPU textures with TextureUpdater/TextureRegionUpdater/TextureDrawer/TextureCreator
 - **IME Support** — Input Method Editor for CJK languages (Chinese, Japanese, Korean)
-- **WindowChrome** — Custom window chrome for frameless windows (hit testing, minimize/maximize/close)
+- **WindowChrome** — Custom window chrome for frameless windows (hit testing, minimize/maximize/close) + runtime fullscreen toggle
 - **Registry[T]** — Generic registry with priority-based backend selection
 - **WebGPU Interfaces** — Device, Queue, Adapter, Surface interfaces
 - **WebGPU Types** — Re-exports from [gputypes](https://github.com/gogpu/gputypes) (TextureFormat, etc.)
@@ -255,9 +255,9 @@ func (ctx *Context) DrawTexture(tex gpucontext.Texture, x, y float32) error {
 }
 ```
 
-### WindowChrome (frameless windows)
+### WindowChrome (frameless windows + fullscreen)
 
-`WindowChrome` enables custom window chrome for frameless windows with custom title bars:
+`WindowChrome` enables custom window chrome for frameless windows and runtime fullscreen toggle:
 
 ```go
 // In gogpu/ui - custom title bar with hit testing
@@ -277,6 +277,8 @@ func (ui *UI) SetupFramelessWindow(provider gpucontext.WindowProvider) {
 wc.Minimize()
 wc.Maximize()       // toggles maximized/restored
 wc.IsMaximized()    // for button icon state
+wc.SetFullscreen(true)  // enter fullscreen (borderless on Win, native on macOS)
+wc.IsFullscreen()       // query fullscreen state
 wc.Close()
 ```
 
