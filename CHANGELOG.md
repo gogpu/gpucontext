@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.0] - 2026-05-06
+
+### Added
+
+- **AdapterInfo on DeviceProvider** (ADR-020) — `AdapterInfo()` method returns `AdapterInfo{Name, Type}` with `AdapterType` enum (Discrete, Integrated, Software, Unknown). Enables gg render mode auto-selection: CPU rasterizer on software adapters (60 FPS) vs GPU accelerator on real hardware. Triggered by software backend 92x regression after SPIR-V interpreter (FEAT-SW-004).
+
 ## [0.16.0] - 2026-04-30
 
 ### Added

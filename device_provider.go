@@ -46,4 +46,10 @@ type DeviceProvider interface {
 	// The adapter provides information about the GPU capabilities.
 	// Some implementations may not expose the adapter.
 	Adapter() Adapter
+
+	// AdapterInfo returns GPU adapter metadata (name, type).
+	// Used by gg for render mode auto-selection: software adapters
+	// prefer CPU rasterizer over GPU shader interpreter.
+	// Returns AdapterTypeUnknown if adapter info is not available.
+	AdapterInfo() AdapterInfo
 }

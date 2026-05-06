@@ -46,3 +46,5 @@
 //
 // Reference: https://github.com/gogpu/gpucontext
 package gpucontext
+
+const stringNone = "None"

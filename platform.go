@@ -129,7 +129,7 @@ func (c CursorShape) String() string {
 	case CursorWait:
 		return "Wait"
 	case CursorNone:
-		return "None"
+		return stringNone
 	default:
 		return "Unknown"
 	}

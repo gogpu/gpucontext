@@ -88,7 +88,7 @@ const (
 func (p PinchType) String() string {
 	switch p {
 	case PinchNone:
-		return "None"
+		return stringNone
 	case PinchHorizontal:
 		return "Horizontal"
 	case PinchVertical:
