@@ -240,7 +240,7 @@ const (
 func (b Button) String() string {
 	switch b {
 	case ButtonNone:
-		return "None"
+		return stringNone
 	case ButtonLeft:
 		return "Left"
 	case ButtonMiddle:
