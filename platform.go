@@ -50,6 +50,55 @@ type PlatformProvider interface {
 	// FontScale returns the user's font size preference multiplier.
 	// 1.0 = default system font size. Used to scale Sp (scale-independent pixels).
 	FontScale() float32
+
+	// SubpixelLayout returns the display's subpixel arrangement for LCD text rendering.
+	// Used by 2D graphics libraries (gg) to enable ClearType-quality font rendering.
+	// Returns SubpixelNone when subpixel info is unavailable or on HiDPI displays
+	// where subpixels are too small to be visible.
+	SubpixelLayout() SubpixelLayout
+}
+
+// SubpixelLayout describes the physical arrangement of RGB subpixels on a display.
+// Used for LCD/ClearType font rendering to achieve sharper text by exploiting
+// the subpixel structure. Qt6 (QPlatformScreen), Wayland (wl_output.geometry),
+// and DRM/KMS (drmModeConnector) all expose this as a display property.
+type SubpixelLayout int
+
+const (
+	// SubpixelNone means no subpixel information is available or applicable.
+	// Text rendering falls back to grayscale anti-aliasing.
+	// Used on HiDPI displays where subpixels are too small to exploit.
+	SubpixelNone SubpixelLayout = iota
+
+	// SubpixelRGB is horizontal RGB ordering (most common: Windows LCD, most external monitors).
+	SubpixelRGB
+
+	// SubpixelBGR is horizontal BGR ordering (some Samsung and older displays).
+	SubpixelBGR
+
+	// SubpixelVRGB is vertical RGB ordering (rare, some rotated displays).
+	SubpixelVRGB
+
+	// SubpixelVBGR is vertical BGR ordering (rare).
+	SubpixelVBGR
+)
+
+// String returns the subpixel layout name for debugging.
+func (s SubpixelLayout) String() string {
+	switch s {
+	case SubpixelNone:
+		return stringNone
+	case SubpixelRGB:
+		return "RGB"
+	case SubpixelBGR:
+		return "BGR"
+	case SubpixelVRGB:
+		return "VRGB"
+	case SubpixelVBGR:
+		return "VBGR"
+	default:
+		return "Unknown"
+	}
 }
 
 // CursorShape represents the mouse cursor shape.
@@ -204,6 +253,9 @@ func (NullPlatformProvider) HighContrast() bool { return false }
 
 // FontScale returns 1.0.
 func (NullPlatformProvider) FontScale() float32 { return 1.0 }
+
+// SubpixelLayout returns SubpixelNone (grayscale AA).
+func (NullPlatformProvider) SubpixelLayout() SubpixelLayout { return SubpixelNone }
 
 // Ensure NullPlatformProvider implements PlatformProvider.
 var _ PlatformProvider = NullPlatformProvider{}

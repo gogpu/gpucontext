@@ -4,8 +4,10 @@
 
 `gpucontext` is the shared foundation for the [gogpu](https://github.com/gogpu) ecosystem, providing interfaces and utilities for GPU resource sharing without circular dependencies.
 
-## Current: v0.16.0
+## Current: v0.18.0
 
+- SubpixelLayout on PlatformProvider (ADR-024, LCD/ClearType auto-detection)
+- AdapterInfo on DeviceProvider (ADR-020, render mode auto-selection)
 - WindowChrome.SetFullscreen / IsFullscreen (ADR-018, runtime fullscreen toggle)
 - CursorMode (Locked/Confined/Normal) for mouse grab / pointer lock
 - PointerEvent.DeltaX/DeltaY for relative mouse movement

@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.18.0] - 2026-05-09
+
+### Added
+
+- **SubpixelLayout on PlatformProvider** (ADR-024) — `SubpixelLayout()` method returns display subpixel arrangement (`SubpixelNone`, `SubpixelRGB`, `SubpixelBGR`, `SubpixelVRGB`, `SubpixelVBGR`). Enables LCD/ClearType font rendering in gg. Follows Qt6 `QPlatformScreen::SubpixelAntialiasingType` pattern — subpixel is a display/OS property, not GPU. `NullPlatformProvider` returns `SubpixelNone` (grayscale AA). Researched Qt6, GTK4/Wayland, FreeType, DRM/KMS — all treat subpixel as platform property.
+
+### Fixed
+
+- **Lint:** extracted `stringNone` reuse for SubpixelLayout.String().
+
 ## [0.17.0] - 2026-05-06
 
 ### Added

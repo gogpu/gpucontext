@@ -141,11 +141,12 @@ func (m *mockPlatformProvider) ClipboardWrite(text string) error {
 	m.clipboard = text
 	return nil
 }
-func (m *mockPlatformProvider) SetCursor(cursor CursorShape) { m.cursor = cursor }
-func (m *mockPlatformProvider) DarkMode() bool               { return m.darkMode }
-func (m *mockPlatformProvider) ReduceMotion() bool           { return m.reduceMotion }
-func (m *mockPlatformProvider) HighContrast() bool           { return m.highContrast }
-func (m *mockPlatformProvider) FontScale() float32           { return m.fontScale }
+func (m *mockPlatformProvider) SetCursor(cursor CursorShape)   { m.cursor = cursor }
+func (m *mockPlatformProvider) DarkMode() bool                 { return m.darkMode }
+func (m *mockPlatformProvider) ReduceMotion() bool             { return m.reduceMotion }
+func (m *mockPlatformProvider) HighContrast() bool             { return m.highContrast }
+func (m *mockPlatformProvider) FontScale() float32             { return m.fontScale }
+func (m *mockPlatformProvider) SubpixelLayout() SubpixelLayout { return SubpixelRGB }
 
 // Ensure mockPlatformProvider implements PlatformProvider.
 var _ PlatformProvider = &mockPlatformProvider{}
