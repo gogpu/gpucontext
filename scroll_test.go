@@ -8,6 +8,47 @@ import (
 	"time"
 )
 
+func TestScrollPhase_Values(t *testing.T) {
+	// Verify scroll phase constants are sequential starting from 0
+	if ScrollPhaseNone != 0 {
+		t.Errorf("ScrollPhaseNone = %d, want 0", ScrollPhaseNone)
+	}
+	if ScrollPhaseBegan != 1 {
+		t.Errorf("ScrollPhaseBegan = %d, want 1", ScrollPhaseBegan)
+	}
+	if ScrollPhaseChanged != 2 {
+		t.Errorf("ScrollPhaseChanged = %d, want 2", ScrollPhaseChanged)
+	}
+	if ScrollPhaseEnded != 3 {
+		t.Errorf("ScrollPhaseEnded = %d, want 3", ScrollPhaseEnded)
+	}
+	if ScrollPhaseCanceled != 4 {
+		t.Errorf("ScrollPhaseCanceled = %d, want 4", ScrollPhaseCanceled)
+	}
+}
+
+func TestScrollPhase_String(t *testing.T) {
+	tests := []struct {
+		phase ScrollPhase
+		want  string
+	}{
+		{ScrollPhaseNone, "None"},
+		{ScrollPhaseBegan, "Began"},
+		{ScrollPhaseChanged, "Changed"},
+		{ScrollPhaseEnded, "Ended"},
+		{ScrollPhaseCanceled, "Canceled"},
+		{ScrollPhase(99), "Unknown"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.want, func(t *testing.T) {
+			if got := tt.phase.String(); got != tt.want {
+				t.Errorf("ScrollPhase(%d).String() = %q, want %q", tt.phase, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestScrollDeltaMode_String(t *testing.T) {
 	tests := []struct {
 		mode ScrollDeltaMode
@@ -64,6 +105,12 @@ func TestScrollEvent_ZeroValue(t *testing.T) {
 	}
 	if ev.Timestamp != 0 {
 		t.Errorf("Zero value Timestamp = %v, want 0", ev.Timestamp)
+	}
+	if ev.Phase != ScrollPhaseNone {
+		t.Errorf("Zero value Phase = %v, want ScrollPhaseNone", ev.Phase)
+	}
+	if ev.IsMomentum {
+		t.Error("Zero value IsMomentum = true, want false")
 	}
 }
 
@@ -174,6 +221,60 @@ func TestScrollEvent_CtrlScroll(t *testing.T) {
 
 	if !ev.Modifiers.HasControl() {
 		t.Error("Should detect Ctrl modifier for zoom detection")
+	}
+}
+
+func TestScrollEvent_WithPhaseAndMomentum(t *testing.T) {
+	// macOS trackpad momentum event
+	ev := ScrollEvent{
+		X:          400,
+		Y:          300,
+		DeltaX:     0,
+		DeltaY:     -5.5,
+		DeltaMode:  ScrollDeltaPixel,
+		Phase:      ScrollPhaseChanged,
+		IsMomentum: true,
+	}
+
+	if ev.Phase != ScrollPhaseChanged {
+		t.Errorf("Phase = %v, want ScrollPhaseChanged", ev.Phase)
+	}
+	if !ev.IsMomentum {
+		t.Error("IsMomentum = false, want true")
+	}
+	if ev.DeltaY != -5.5 {
+		t.Errorf("DeltaY = %f, want -5.5", ev.DeltaY)
+	}
+}
+
+func TestScrollEvent_GestureLifecycle(t *testing.T) {
+	// Simulate a complete macOS trackpad gesture lifecycle
+	phases := []struct {
+		phase      ScrollPhase
+		isMomentum bool
+		desc       string
+	}{
+		{ScrollPhaseBegan, false, "finger touch"},
+		{ScrollPhaseChanged, false, "finger drag"},
+		{ScrollPhaseChanged, false, "finger drag"},
+		{ScrollPhaseEnded, false, "finger lift"},
+		{ScrollPhaseBegan, true, "momentum start"},
+		{ScrollPhaseChanged, true, "momentum coast"},
+		{ScrollPhaseChanged, true, "momentum coast"},
+		{ScrollPhaseEnded, true, "momentum stop"},
+	}
+
+	for i, tt := range phases {
+		ev := ScrollEvent{
+			Phase:      tt.phase,
+			IsMomentum: tt.isMomentum,
+		}
+		if ev.Phase != tt.phase {
+			t.Errorf("step %d (%s): Phase = %v, want %v", i, tt.desc, ev.Phase, tt.phase)
+		}
+		if ev.IsMomentum != tt.isMomentum {
+			t.Errorf("step %d (%s): IsMomentum = %v, want %v", i, tt.desc, ev.IsMomentum, tt.isMomentum)
+		}
 	}
 }
 
