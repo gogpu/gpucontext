@@ -5,6 +5,48 @@ package gpucontext
 
 import "time"
 
+// ScrollPhase indicates the phase of a scroll gesture.
+// On macOS trackpad: reflects active touch or inertial momentum.
+// On Wayland: reflects axis source start/stop.
+// For discrete mouse wheel or platforms without gesture phases: always ScrollPhaseNone.
+type ScrollPhase uint8
+
+const (
+	// ScrollPhaseNone indicates a discrete scroll event (e.g. mouse wheel click).
+	// No gesture phase tracking is available.
+	ScrollPhaseNone ScrollPhase = iota
+
+	// ScrollPhaseBegan indicates the start of a scroll gesture or momentum phase.
+	ScrollPhaseBegan
+
+	// ScrollPhaseChanged indicates an ongoing scroll gesture or momentum phase.
+	ScrollPhaseChanged
+
+	// ScrollPhaseEnded indicates the end of a scroll gesture or momentum phase.
+	ScrollPhaseEnded
+
+	// ScrollPhaseCanceled indicates the scroll gesture was interrupted.
+	ScrollPhaseCanceled
+)
+
+// String returns the name of the scroll phase.
+func (p ScrollPhase) String() string {
+	switch p {
+	case ScrollPhaseNone:
+		return stringNone
+	case ScrollPhaseBegan:
+		return "Began"
+	case ScrollPhaseChanged:
+		return "Changed"
+	case ScrollPhaseEnded:
+		return "Ended"
+	case ScrollPhaseCanceled:
+		return "Canceled"
+	default:
+		return "Unknown"
+	}
+}
+
 // ScrollEvent represents a scroll wheel or touchpad scroll event.
 //
 // This event is separate from PointerEvent because scroll events have
@@ -55,6 +97,19 @@ type ScrollEvent struct {
 	// Useful for smooth scrolling animations.
 	// Zero if timestamps are not available on the platform.
 	Timestamp time.Duration
+
+	// Phase indicates the scroll gesture phase.
+	// On macOS: reflects NSEvent.phase (active touch gesture).
+	// On Wayland: derived from axis_source and axis_stop events.
+	// For discrete mouse wheel: always ScrollPhaseNone.
+	Phase ScrollPhase
+
+	// IsMomentum indicates this is an inertial/momentum scroll event.
+	// On macOS trackpad: true when NSEvent.momentumPhase is active
+	// (user lifted fingers but scroll continues with deceleration).
+	// Applications can filter momentum events to stop coasting on cursor exit.
+	// On platforms without momentum scrolling: always false.
+	IsMomentum bool
 }
 
 // ScrollDeltaMode indicates the unit of scroll delta values.
