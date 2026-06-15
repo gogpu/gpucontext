@@ -3,68 +3,100 @@
 
 package gpucontext
 
-// WebGPU Type Token Interfaces for Cross-Package Sharing
-//
-// This file defines type token interfaces for GPU objects (Device, Queue, etc.)
-// that enable type-safe dependency injection between packages without coupling
-// them to a specific GPU implementation.
-//
-// Concrete types (e.g., *wgpu.Device) satisfy these empty interfaces implicitly.
-// Consumers type-assert to the concrete type when they need the full API.
-//
-// Note: TextureView and CommandEncoder are opaque handle structs (not interfaces),
-// defined in handle.go. They use unsafe.Pointer for compile-time type safety
-// without boxing allocations (ADR-018).
-//
-// Types (TextureFormat, BufferUsage, etc.) are in the gputypes package.
-//
-// Usage:
-//
-//	import (
-//	    "github.com/gogpu/gpucontext"
-//	    "github.com/gogpu/gputypes"
-//	)
+import "unsafe"
 
-// Device is a type-safe token for a logical GPU device.
+// WebGPU Opaque Handle Types for Cross-Package Sharing
 //
-// The unexported sentinel method prevents nil or arbitrary values from
-// satisfying this interface — only concrete GPU implementations (e.g.,
-// *wgpu.Device) can implement it. Consumers type-assert to the concrete
-// type when they need the full API:
+// GPU resource handles (Device, Queue, Adapter, Surface, Instance) are
+// struct tokens wrapping unsafe.Pointer — the same pattern as TextureView
+// and CommandEncoder in handle.go.
+//
+// This design provides:
+//   - Cross-package type safety: Device, Queue, Adapter are distinct types
+//   - GC safety: unsafe.Pointer in struct fields is traced by GC (Go spec §Safety)
+//   - Zero allocations: 8-byte value type, no interface boxing
+//   - Compile-time protection: ptr field is unexported, only NewDevice() etc. can construct
+//
+// Precedent: reflect.Value uses the identical pattern (struct with unsafe.Pointer field).
+//
+// Consumers extract the concrete type via Pointer():
 //
 //	dev := provider.Device()
-//	wgpuDev, ok := dev.(*wgpu.Device)
-type Device interface {
-	gpuDevice() // sentinel — only wgpu.Device implements this
-}
-
-// Queue is a type-safe token for a GPU command queue.
+//	wgpuDev := (*wgpu.Device)(dev.Pointer())
 //
-// See Device for the sentinel method pattern.
-type Queue interface {
-	gpuQueue() // sentinel — only wgpu.Queue implements this
-}
+// Or via helper in wgpu package:
+//
+//	wgpuDev := wgpu.DeviceFromHandle(dev)
+//
+// Types (TextureFormat, BufferUsage, etc.) are in the gputypes package.
 
-// Adapter is a type-safe token for a physical GPU adapter.
-type Adapter interface {
-	gpuAdapter() // sentinel — only wgpu.Adapter implements this
-}
+// Device is a type-safe opaque handle to a logical GPU device.
+// 8 bytes, value type, zero allocations. GC-safe.
+type Device struct{ ptr unsafe.Pointer }
 
-// Surface is a type-safe token for a rendering surface (window).
-type Surface interface {
-	gpuSurface() // sentinel — only wgpu.Surface implements this
-}
+// NewDevice creates a Device handle from an unsafe.Pointer to a concrete
+// GPU device (e.g., *wgpu.Device).
+func NewDevice(ptr unsafe.Pointer) Device { return Device{ptr: ptr} }
 
-// TextureView is now a type-safe opaque handle struct defined in handle.go.
-// See NewTextureView, TextureView.Pointer, TextureView.IsNil.
+// Pointer returns the underlying unsafe.Pointer.
+func (d Device) Pointer() unsafe.Pointer { return d.ptr }
 
-// Instance is a type-safe token for the GPU instance entry point.
-type Instance interface {
-	gpuInstance() // sentinel — only wgpu.Instance implements this
-}
+// IsNil reports whether the handle holds no resource (zero value).
+func (d Device) IsNil() bool { return d.ptr == nil }
+
+// Queue is a type-safe opaque handle to a GPU command queue.
+// 8 bytes, value type, zero allocations. GC-safe.
+type Queue struct{ ptr unsafe.Pointer }
+
+// NewQueue creates a Queue handle.
+func NewQueue(ptr unsafe.Pointer) Queue { return Queue{ptr: ptr} }
+
+// Pointer returns the underlying unsafe.Pointer.
+func (q Queue) Pointer() unsafe.Pointer { return q.ptr }
+
+// IsNil reports whether the handle holds no resource.
+func (q Queue) IsNil() bool { return q.ptr == nil }
+
+// Adapter is a type-safe opaque handle to a physical GPU adapter.
+// 8 bytes, value type, zero allocations. GC-safe.
+type Adapter struct{ ptr unsafe.Pointer }
+
+// NewAdapter creates an Adapter handle.
+func NewAdapter(ptr unsafe.Pointer) Adapter { return Adapter{ptr: ptr} }
+
+// Pointer returns the underlying unsafe.Pointer.
+func (a Adapter) Pointer() unsafe.Pointer { return a.ptr }
+
+// IsNil reports whether the handle holds no resource.
+func (a Adapter) IsNil() bool { return a.ptr == nil }
+
+// Surface is a type-safe opaque handle to a rendering surface (window).
+// 8 bytes, value type, zero allocations. GC-safe.
+type Surface struct{ ptr unsafe.Pointer }
+
+// NewSurface creates a Surface handle.
+func NewSurface(ptr unsafe.Pointer) Surface { return Surface{ptr: ptr} }
+
+// Pointer returns the underlying unsafe.Pointer.
+func (s Surface) Pointer() unsafe.Pointer { return s.ptr }
+
+// IsNil reports whether the handle holds no resource.
+func (s Surface) IsNil() bool { return s.ptr == nil }
+
+// Instance is a type-safe opaque handle to the GPU instance entry point.
+// 8 bytes, value type, zero allocations. GC-safe.
+type Instance struct{ ptr unsafe.Pointer }
+
+// NewInstance creates an Instance handle.
+func NewInstance(ptr unsafe.Pointer) Instance { return Instance{ptr: ptr} }
+
+// Pointer returns the underlying unsafe.Pointer.
+func (i Instance) Pointer() unsafe.Pointer { return i.ptr }
+
+// IsNil reports whether the handle holds no resource.
+func (i Instance) IsNil() bool { return i.ptr == nil }
 
 // OpenDevice bundles a device and queue together.
-// This is a convenience type for initialization.
 type OpenDevice struct {
 	Device Device
 	Queue  Queue

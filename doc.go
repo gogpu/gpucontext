@@ -30,18 +30,23 @@
 // By defining a minimal interface here, different packages can share
 // GPU resources without depending on each other.
 //
+// # GPU Handle Types
+//
+// Device, Queue, Adapter, Surface, Instance are opaque struct tokens
+// wrapping unsafe.Pointer — same pattern as TextureView and CommandEncoder.
+// 8 bytes, value type, zero allocations, GC-safe (reflect.Value precedent).
+//
 // # Example Usage
 //
-//	// In gogpu/gogpu - implements DeviceProvider
-//	func (app *App) Device() gpucontext.Device { return app.renderer.device }
-//	func (app *App) Queue() gpucontext.Queue { return app.renderer.queue }
+//	// In gogpu/gogpu — wraps *wgpu.Device into opaque handle
+//	func (a *adapter) Device() gpucontext.Device {
+//	    return gpucontext.NewDevice(unsafe.Pointer(a.renderer.device))
+//	}
 //
-//	// In gogpu/gg - uses DeviceProvider
-//	func NewGPUCanvas(provider gpucontext.DeviceProvider) *Canvas {
-//	    return &Canvas{
-//	        device: provider.Device(),
-//	        queue:  provider.Queue(),
-//	    }
+//	// In gogpu/gg — extracts concrete type from handle
+//	func initGPU(provider gpucontext.DeviceProvider) {
+//	    dev := provider.Device()
+//	    wgpuDev := (*wgpu.Device)(dev.Pointer())
 //	}
 //
 // Reference: https://github.com/gogpu/gpucontext

@@ -5,19 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.20.0] - 2026-06-15
+## [0.21.0] - 2026-06-15
 
 ### Changed
 
-- **Type token interfaces: sentinel methods (BREAKING)** — `Device`, `Queue`,
-  `Adapter`, `Surface`, `Instance` interfaces now have unexported sentinel methods
-  (`gpuDevice()`, `gpuQueue()`, etc.). Previously empty `interface{}` — any value
-  including `nil` satisfied them. Now only concrete GPU implementations (e.g.,
-  `*wgpu.Device`) can implement them. Compile-time type safety.
-  
-  This is a breaking change: code that passed `nil` or arbitrary values as
-  `gpucontext.Device` will no longer compile. Use the concrete type or the
-  Null providers for testing.
+- **GPU handles: interface → struct tokens (BREAKING)** — `Device`, `Queue`,
+  `Adapter`, `Surface`, `Instance` changed from interfaces to opaque struct
+  tokens wrapping `unsafe.Pointer`. Same pattern as `TextureView` and
+  `CommandEncoder` (ADR-018).
+
+  **Why:** v0.20.0 used unexported sentinel methods on interfaces, but Go spec
+  prohibits cross-package satisfaction of interfaces with unexported methods.
+  `*wgpu.Device` could never implement `gpucontext.Device` — build broke in
+  gogpu/gg/ui. Struct tokens solve this: 8 bytes, zero alloc, GC-safe
+  (`unsafe.Pointer` in struct fields is traced — `reflect.Value` precedent),
+  compile-time type distinct (Device ≠ Queue).
+
+  **Migration:**
+  ```go
+  // Before (v0.19.0):
+  dev := provider.Device()           // gpucontext.Device (interface)
+  wgpuDev := dev.(*wgpu.Device)      // type assertion
+
+  // After (v0.21.0):
+  dev := provider.Device()           // gpucontext.Device (struct)
+  wgpuDev := (*wgpu.Device)(dev.Pointer())  // unsafe.Pointer extraction
+  // Or via helper:
+  wgpuDev := wgpu.DeviceFromHandle(dev)
+
+  // Nil check:
+  // Before: dev != nil
+  // After:  !dev.IsNil()
+  ```
+
+  Constructors: `NewDevice(ptr)`, `NewQueue(ptr)`, `NewAdapter(ptr)`,
+  `NewSurface(ptr)`, `NewInstance(ptr)`. Extraction: `.Pointer()`, `.IsNil()`.
+
+## [0.20.0] - 2026-06-15 [YANKED]
+
+**DO NOT USE** — unexported sentinel methods on interfaces do not work
+cross-package per Go spec. `*wgpu.Device` cannot implement `gpucontext.Device`.
+Fixed in v0.21.0 with struct tokens.
 
 ## [0.19.0] - 2026-05-16
 
