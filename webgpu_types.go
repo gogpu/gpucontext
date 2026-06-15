@@ -25,49 +25,43 @@ package gpucontext
 //	    "github.com/gogpu/gputypes"
 //	)
 
-// Device is a type token for a logical GPU device.
+// Device is a type-safe token for a logical GPU device.
 //
-// Concrete implementations (e.g., *wgpu.Device) satisfy this interface
-// implicitly. Consumers that need the full device API should type-assert
-// to the concrete type:
+// The unexported sentinel method prevents nil or arbitrary values from
+// satisfying this interface — only concrete GPU implementations (e.g.,
+// *wgpu.Device) can implement it. Consumers type-assert to the concrete
+// type when they need the full API:
 //
 //	dev := provider.Device()
 //	wgpuDev, ok := dev.(*wgpu.Device)
-//	if ok {
-//	    halDevice := wgpuDev.HalDevice()
-//	}
-//
-// The interface is intentionally minimal to avoid coupling gpucontext
-// to any specific GPU implementation.
-type Device interface{}
+type Device interface {
+	gpuDevice() // sentinel — only wgpu.Device implements this
+}
 
-// Queue is a type token for a GPU command queue.
+// Queue is a type-safe token for a GPU command queue.
 //
-// Concrete implementations (e.g., *wgpu.Queue) satisfy this interface
-// implicitly. Consumers that need the full queue API should type-assert
-// to the concrete type:
-//
-//	q := provider.Queue()
-//	wgpuQueue, ok := q.(*wgpu.Queue)
-type Queue interface{}
+// See Device for the sentinel method pattern.
+type Queue interface {
+	gpuQueue() // sentinel — only wgpu.Queue implements this
+}
 
-// Adapter is a type token for a physical GPU adapter.
-// Consumers that need the full adapter API should type-assert
-// to the concrete type (e.g., *wgpu.Adapter).
-type Adapter interface{}
+// Adapter is a type-safe token for a physical GPU adapter.
+type Adapter interface {
+	gpuAdapter() // sentinel — only wgpu.Adapter implements this
+}
 
-// Surface is a type token for a rendering surface (window).
-// Consumers that need the full surface API should type-assert
-// to the concrete type (e.g., *wgpu.Surface).
-type Surface interface{}
+// Surface is a type-safe token for a rendering surface (window).
+type Surface interface {
+	gpuSurface() // sentinel — only wgpu.Surface implements this
+}
 
 // TextureView is now a type-safe opaque handle struct defined in handle.go.
 // See NewTextureView, TextureView.Pointer, TextureView.IsNil.
 
-// Instance is a type token for the GPU instance entry point.
-// Consumers that need the full instance API should type-assert
-// to the concrete type (e.g., *wgpu.Instance).
-type Instance interface{}
+// Instance is a type-safe token for the GPU instance entry point.
+type Instance interface {
+	gpuInstance() // sentinel — only wgpu.Instance implements this
+}
 
 // OpenDevice bundles a device and queue together.
 // This is a convenience type for initialization.
