@@ -1,0 +1,21 @@
+# gpucontext — Shared GPU Interfaces for GoGPU
+
+> Cross-package contract for GPU resource sharing. Interfaces and opaque handle types used by all GoGPU ecosystem packages.
+
+## Docs
+
+- [gpucontext API](https://pkg.go.dev/github.com/gogpu/gpucontext): DeviceProvider, EventSource, WindowProvider, PlatformProvider, opaque handles
+- [AGENTS.md](https://github.com/gogpu/gpucontext/blob/main/AGENTS.md): AI agent instructions for this package
+
+## Ecosystem
+
+- [GoGPU Ecosystem](https://github.com/gogpu/gogpu/blob/main/AGENTS.md): Full ecosystem map and instructions
+- [gogpu](https://pkg.go.dev/github.com/gogpu/gogpu): App framework (implements DeviceProvider)
+- [wgpu](https://pkg.go.dev/github.com/gogpu/wgpu): WebGPU implementation (handle helpers)
+- [gg](https://pkg.go.dev/github.com/gogpu/gg): 2D graphics (consumes DeviceProvider)
+- [ui](https://pkg.go.dev/github.com/gogpu/ui): GUI toolkit (consumes EventSource, WindowProvider)
+
+## Community
+
+- [GitHub](https://github.com/gogpu/gpucontext)
+- [Open Collective](https://opencollective.com/gogpu)
