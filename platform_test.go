@@ -55,6 +55,12 @@ func TestNullPlatformProvider_Defaults(t *testing.T) {
 	if got := pp.FontScale(); got != 1.0 {
 		t.Errorf("FontScale() = %f, want 1.0", got)
 	}
+	if got := pp.SubpixelLayout(); got != SubpixelNone {
+		t.Errorf("SubpixelLayout() = %v, want SubpixelNone", got)
+	}
+	if got := pp.FontSmoothing(); got != FontSmoothingGrayscale {
+		t.Errorf("FontSmoothing() = %v, want FontSmoothingGrayscale", got)
+	}
 }
 
 func TestCursorShape_String(t *testing.T) {
@@ -147,6 +153,7 @@ func (m *mockPlatformProvider) ReduceMotion() bool             { return m.reduce
 func (m *mockPlatformProvider) HighContrast() bool             { return m.highContrast }
 func (m *mockPlatformProvider) FontScale() float32             { return m.fontScale }
 func (m *mockPlatformProvider) SubpixelLayout() SubpixelLayout { return SubpixelRGB }
+func (m *mockPlatformProvider) FontSmoothing() FontSmoothing   { return FontSmoothingSubpixel }
 
 // Ensure mockPlatformProvider implements PlatformProvider.
 var _ PlatformProvider = &mockPlatformProvider{}
@@ -191,5 +198,64 @@ func TestPlatformProvider_CustomImplementation(t *testing.T) {
 	}
 	if got := pp.FontScale(); got != 1.5 {
 		t.Errorf("FontScale() = %f, want 1.5", got)
+	}
+
+	// Test font smoothing delegation
+	if got := pp.FontSmoothing(); got != FontSmoothingSubpixel {
+		t.Errorf("FontSmoothing() = %v, want FontSmoothingSubpixel", got)
+	}
+}
+
+func TestFontSmoothing_String(t *testing.T) {
+	tests := []struct {
+		fs   FontSmoothing
+		want string
+	}{
+		{FontSmoothingNone, "None"},
+		{FontSmoothingGrayscale, "Grayscale"},
+		{FontSmoothingSubpixel, "Subpixel"},
+		{FontSmoothing(99), "Unknown"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.want, func(t *testing.T) {
+			if got := tt.fs.String(); got != tt.want {
+				t.Errorf("FontSmoothing(%d).String() = %q, want %q", tt.fs, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFontSmoothing_Values(t *testing.T) {
+	if FontSmoothingNone != 0 {
+		t.Errorf("FontSmoothingNone = %d, want 0", FontSmoothingNone)
+	}
+	if FontSmoothingGrayscale != 1 {
+		t.Errorf("FontSmoothingGrayscale = %d, want 1", FontSmoothingGrayscale)
+	}
+	if FontSmoothingSubpixel != 2 {
+		t.Errorf("FontSmoothingSubpixel = %d, want 2", FontSmoothingSubpixel)
+	}
+}
+
+func TestSubpixelLayout_String(t *testing.T) {
+	tests := []struct {
+		sl   SubpixelLayout
+		want string
+	}{
+		{SubpixelNone, "None"},
+		{SubpixelRGB, "RGB"},
+		{SubpixelBGR, "BGR"},
+		{SubpixelVRGB, "VRGB"},
+		{SubpixelVBGR, "VBGR"},
+		{SubpixelLayout(99), "Unknown"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.want, func(t *testing.T) {
+			if got := tt.sl.String(); got != tt.want {
+				t.Errorf("SubpixelLayout(%d).String() = %q, want %q", tt.sl, got, tt.want)
+			}
+		})
 	}
 }
