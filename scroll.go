@@ -68,12 +68,12 @@ func (p ScrollPhase) String() string {
 //	    }
 //	})
 type ScrollEvent struct {
-	// X is the pointer horizontal position at the time of scrolling.
-	// Uses logical pixels relative to the window content area.
+	// X is the pointer horizontal position at the time of scrolling, in
+	// logical DIP (device-independent pixels). Consistent with App.Size().
 	X float64
 
-	// Y is the pointer vertical position at the time of scrolling.
-	// Uses logical pixels relative to the window content area.
+	// Y is the pointer vertical position at the time of scrolling, in
+	// logical DIP (device-independent pixels). Consistent with App.Size().
 	Y float64
 
 	// DeltaX is the horizontal scroll amount.
