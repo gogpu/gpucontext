@@ -44,14 +44,21 @@ type EventSource interface {
 	OnTextInput(func(text string))
 
 	// Mouse events
+	//
+	// All mouse/pointer coordinates (x, y) are in logical DIP (device-independent
+	// pixels), consistent with WindowProvider.Size(). Do NOT divide by ScaleFactor —
+	// the framework applies DPI scaling internally on all platforms.
 
 	// OnMouseMove registers a callback for mouse movement.
+	// x, y are in logical DIP relative to the window content area.
 	OnMouseMove(func(x, y float64))
 
 	// OnMousePress registers a callback for mouse button press.
+	// x, y are in logical DIP relative to the window content area.
 	OnMousePress(func(button MouseButton, x, y float64))
 
 	// OnMouseRelease registers a callback for mouse button release.
+	// x, y are in logical DIP relative to the window content area.
 	OnMouseRelease(func(button MouseButton, x, y float64))
 
 	// OnScroll registers a callback for scroll wheel events.

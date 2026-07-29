@@ -42,12 +42,16 @@ type PointerEvent struct {
 	// The ID remains constant from PointerDown through PointerUp/PointerCancel.
 	PointerID int
 
-	// X is the horizontal position relative to the window content area.
-	// Uses logical pixels (CSS pixels equivalent).
+	// X is the horizontal position relative to the window content area, in
+	// logical DIP (device-independent pixels). Consistent with App.Size() on
+	// all platforms. Do NOT divide by ScaleFactor — DPI scaling is applied
+	// internally by the framework.
 	X float64
 
-	// Y is the vertical position relative to the window content area.
-	// Uses logical pixels (CSS pixels equivalent).
+	// Y is the vertical position relative to the window content area, in
+	// logical DIP (device-independent pixels). Consistent with App.Size() on
+	// all platforms. Do NOT divide by ScaleFactor — DPI scaling is applied
+	// internally by the framework.
 	Y float64
 
 	// Pressure indicates the normalized pressure of the pointer input.
