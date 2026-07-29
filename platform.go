@@ -56,6 +56,12 @@ type PlatformProvider interface {
 	// Returns SubpixelNone when subpixel info is unavailable or on HiDPI displays
 	// where subpixels are too small to be visible.
 	SubpixelLayout() SubpixelLayout
+
+	// FontSmoothing returns the OS text anti-aliasing mode.
+	// Used by text rendering pipelines to select between aliased, grayscale, and
+	// subpixel anti-aliasing. The result reflects the system-wide user preference
+	// (ClearType on Windows, font smoothing on macOS/Linux).
+	FontSmoothing() FontSmoothing
 }
 
 // SubpixelLayout describes the physical arrangement of RGB subpixels on a display.
@@ -96,6 +102,42 @@ func (s SubpixelLayout) String() string {
 		return "VRGB"
 	case SubpixelVBGR:
 		return "VBGR"
+	default:
+		return "Unknown"
+	}
+}
+
+// FontSmoothing describes the OS text anti-aliasing mode.
+// This is distinct from SubpixelLayout: FontSmoothing tells you HOW the text
+// is anti-aliased (aliased / grayscale / subpixel), while SubpixelLayout tells
+// you the physical subpixel arrangement (RGB / BGR / etc.) when subpixel AA
+// is active.
+//
+// Detection sources by platform:
+//   - Windows: SPI_GETFONTSMOOTHING + SPI_GETFONTSMOOTHINGTYPE
+//   - macOS:   always Grayscale (Mojave+ disabled subpixel AA system-wide)
+//   - Linux:   Xft.antialias + Xft.rgba from RESOURCE_MANAGER / fontconfig
+//   - Browser: always Grayscale (browser controls text rendering)
+type FontSmoothing int
+
+const (
+	// FontSmoothingNone means smoothing is disabled — render aliased (bitmap-style) text.
+	FontSmoothingNone FontSmoothing = iota
+	// FontSmoothingGrayscale means grayscale anti-aliasing (no subpixel exploitation).
+	FontSmoothingGrayscale
+	// FontSmoothingSubpixel means LCD subpixel anti-aliasing (ClearType on Windows).
+	FontSmoothingSubpixel
+)
+
+// String returns the font smoothing mode name for debugging.
+func (f FontSmoothing) String() string {
+	switch f {
+	case FontSmoothingNone:
+		return stringNone
+	case FontSmoothingGrayscale:
+		return "Grayscale"
+	case FontSmoothingSubpixel:
+		return "Subpixel"
 	default:
 		return "Unknown"
 	}
@@ -256,6 +298,9 @@ func (NullPlatformProvider) FontScale() float32 { return 1.0 }
 
 // SubpixelLayout returns SubpixelNone (grayscale AA).
 func (NullPlatformProvider) SubpixelLayout() SubpixelLayout { return SubpixelNone }
+
+// FontSmoothing returns FontSmoothingGrayscale (safe default).
+func (NullPlatformProvider) FontSmoothing() FontSmoothing { return FontSmoothingGrayscale }
 
 // Ensure NullPlatformProvider implements PlatformProvider.
 var _ PlatformProvider = NullPlatformProvider{}
