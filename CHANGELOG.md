@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.23.0] - 2026-07-30
+
+### Added
+
+- **`InputEvent` sealed interface** (ADR-058) — unified event type for SDL-style event queue. Sealed via unexported `inputEventTag()` marker — only gpucontext types implement it. Enables exhaustive type switch handling.
+- **`KeyEvent`** struct — keyboard key state change (Key, Modifiers, Pressed)
+- **`CharEvent`** struct — committed text input (Char rune)
+- **`FocusEvent`** struct — window focus state change (Focused bool)
+- **`ResizeEvent`** struct — window content area size change (Width, Height in logical DIP)
+- `PointerEvent` and `ScrollEvent` now implement `InputEvent` interface
+- 8 test cases covering interface satisfaction, type switch, field access
+
 ## [0.22.0] - 2026-07-29
 
 ### Added
