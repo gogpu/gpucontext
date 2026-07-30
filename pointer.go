@@ -124,6 +124,8 @@ type PointerEvent struct {
 	Timestamp time.Duration
 }
 
+func (PointerEvent) inputEventTag() {}
+
 // PointerEventType indicates the type of pointer event.
 type PointerEventType uint8
 

@@ -112,6 +112,8 @@ type ScrollEvent struct {
 	IsMomentum bool
 }
 
+func (ScrollEvent) inputEventTag() {}
+
 // ScrollDeltaMode indicates the unit of scroll delta values.
 type ScrollDeltaMode uint8
 
