@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.24.0] - 2026-08-01
+
+### Added
+
+- **`ScaleChangedEvent`** (ADR-059, gogpu#409) — runtime DPI/scale factor change event. Emitted when window moves between monitors with different DPI or OS DPI settings change. Carries `ScaleFactor`, `Width`, `Height`. Event ordering: `ScaleChangedEvent` before `ResizeEvent` (cause before effect, winit pattern). Enterprise research: winit, Qt6, SDL3, Flutter — all emit separate DPI event.
+
 ## [0.23.0] - 2026-07-30
 
 ### Added
