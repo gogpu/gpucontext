@@ -13,13 +13,14 @@ func TestInputEventInterface(t *testing.T) {
 		FocusEvent{Focused: true},
 		FocusEvent{Focused: false},
 		ResizeEvent{Width: 800, Height: 600},
+		ScaleChangedEvent{ScaleFactor: 2.0, Width: 800, Height: 600},
 		PointerEvent{Type: PointerDown, X: 100, Y: 200},
 		PointerEvent{Type: PointerMove, X: 150, Y: 250},
 		ScrollEvent{DeltaY: -3.0, DeltaMode: ScrollDeltaLine},
 	}
 
-	if len(events) != 9 {
-		t.Fatalf("expected 9 events, got %d", len(events))
+	if len(events) != 10 {
+		t.Fatalf("expected 10 events, got %d", len(events))
 	}
 
 	for i, ev := range events {
@@ -37,6 +38,7 @@ func TestInputEventTypeSwitch(t *testing.T) {
 		CharEvent{Char: 'x'},
 		FocusEvent{Focused: true},
 		ResizeEvent{Width: 1024, Height: 768},
+		ScaleChangedEvent{ScaleFactor: 2.0, Width: 800, Height: 600},
 	}
 
 	counts := map[string]int{}
@@ -54,12 +56,14 @@ func TestInputEventTypeSwitch(t *testing.T) {
 			counts["focus"]++
 		case ResizeEvent:
 			counts["resize"]++
+		case ScaleChangedEvent:
+			counts["scale"]++
 		default:
 			t.Errorf("unexpected event type: %T", ev)
 		}
 	}
 
-	for _, name := range []string{"key", "pointer", "scroll", "char", "focus", "resize"} {
+	for _, name := range []string{"key", "pointer", "scroll", "char", "focus", "resize", "scale"} {
 		if counts[name] != 1 {
 			t.Errorf("expected 1 %s event, got %d", name, counts[name])
 		}
@@ -104,6 +108,27 @@ func TestResizeEventFields(t *testing.T) {
 	ev := ResizeEvent{Width: 1920, Height: 1080}
 	if ev.Width != 1920 || ev.Height != 1080 {
 		t.Errorf("got %dx%d, want 1920x1080", ev.Width, ev.Height)
+	}
+}
+
+func TestScaleChangedEventFields(t *testing.T) {
+	ev := ScaleChangedEvent{ScaleFactor: 2.0, Width: 800, Height: 600}
+	if ev.ScaleFactor != 2.0 {
+		t.Errorf("ScaleFactor = %v, want 2.0", ev.ScaleFactor)
+	}
+	if ev.Width != 800 || ev.Height != 600 {
+		t.Errorf("got %dx%d, want 800x600", ev.Width, ev.Height)
+	}
+}
+
+func TestScaleChangedEventImplementsInputEvent(t *testing.T) {
+	var ev InputEvent = ScaleChangedEvent{ScaleFactor: 1.5, Width: 1024, Height: 768}
+	se, ok := ev.(ScaleChangedEvent)
+	if !ok {
+		t.Fatal("ScaleChangedEvent does not implement InputEvent")
+	}
+	if se.ScaleFactor != 1.5 {
+		t.Errorf("ScaleFactor = %v, want 1.5", se.ScaleFactor)
 	}
 }
 

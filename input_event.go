@@ -86,3 +86,23 @@ type ResizeEvent struct {
 }
 
 func (ResizeEvent) inputEventTag() {}
+
+// ScaleChangedEvent represents a DPI scale factor change.
+//
+// Emitted when a window moves between monitors with different DPI (e.g.,
+// Retina 2x → FullHD 1x), or when the OS DPI setting changes at runtime.
+//
+// ScaleFactor is the new display scale (1.0 = standard, 2.0 = Retina/HiDPI).
+// Width and Height are the new logical size in DIP — may change during DPI
+// transition because the OS adjusts the window to preserve visual size.
+//
+// Event ordering: ScaleChangedEvent is emitted BEFORE ResizeEvent (cause
+// before effect, winit pattern). Consumers should update their rendering
+// scale before processing the new dimensions.
+type ScaleChangedEvent struct {
+	ScaleFactor float64
+	Width       int
+	Height      int
+}
+
+func (ScaleChangedEvent) inputEventTag() {}
