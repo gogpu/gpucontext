@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.25.0] - 2026-08-09
+
+### Added
+
+- **Damage tracking interfaces** (ADR-065) — multi-renderer damage aggregation for shared surfaces. When multiple renderers (gg, g3d, video, compose) share a single GPU surface, each registers as a damage source and reports per-frame damage rectangles. The compositor unions all sources at present time.
+  - `DamageReporter` interface — 2-method frozen contract (`ReportDamage`, `ReportDamageWithReason`)
+  - `DamageCategory` enum — 6 categories (`Content`, `Layout`, `Animation`, `Resize`, `Full`, `External`)
+  - `DamageReason` struct — typed category + human-readable detail string
+  - `DamageSourceSnapshot` struct — per-source frame snapshot (name, color, rects, reason)
+  - `DamageOverlayRenderer` interface — custom overlay rendering for libraries with text capability
+  - `DamageOverlayInfo` struct — structured per-source data passed to overlay renderer
+  - Design follows Chromium `cc/DamageTracker` pattern — adapted for explicit registration model
+
+- **Pluggable debug overlay system** (ADR-066) — GTK4 Inspector-inspired overlay architecture. Multiple debug overlays register with the compositor and draw in registration order after content, before present.
+  - `DebugOverlay` interface — 2-method frozen contract (`Name`, `Draw`)
+  - `DebugOverlayContext` struct — GPU resources and frame metadata for overlay rendering
+  - Self-sustaining render loop: `Draw()` returns true → compositor calls `RequestRedraw()`
+  - Env var activation: `GOGPU_DEBUG_DAMAGE=overlay`, `GOGPU_DEBUG_FPS=overlay`, `GOGPU_DEBUG_DIRTY=overlay`
+
 ## [0.24.0] - 2026-08-01
 
 ### Added
