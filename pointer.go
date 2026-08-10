@@ -248,11 +248,11 @@ func (b Button) String() string {
 	case ButtonNone:
 		return stringNone
 	case ButtonLeft:
-		return "Left"
+		return stringLeft
 	case ButtonMiddle:
-		return "Middle"
+		return stringMiddle
 	case ButtonRight:
-		return "Right"
+		return stringRight
 	case ButtonX1:
 		return "X1"
 	case ButtonX2:

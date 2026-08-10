@@ -52,4 +52,9 @@
 // Reference: https://github.com/gogpu/gpucontext
 package gpucontext
 
-const stringNone = "None"
+const (
+	stringNone   = "None"
+	stringLeft   = "Left"
+	stringRight  = "Right"
+	stringMiddle = "Middle"
+)

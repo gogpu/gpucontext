@@ -491,9 +491,9 @@ func (k Key) String() string {
 	case KeyPageDown:
 		return "PageDown"
 	case KeyLeft:
-		return "Left"
+		return stringLeft
 	case KeyRight:
-		return "Right"
+		return stringRight
 	case KeyUp:
 		return "Up"
 	case KeyDown:
