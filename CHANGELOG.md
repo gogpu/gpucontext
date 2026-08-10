@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.27.0] - 2026-08-10
+
+### Added
+
+- **`SurfaceCompositor` interface** (ADR-067) — compositor-level bridge between gogpu and content renderers (gg, g3d). 4 methods: `ShouldPreserveContent()`, `DamageRects()`, `MarkContentRendered()`, `CompositeMSAAOverlay()`. Enables drawing library to delegate surface-level decisions (LoadOp, damage scissoring, MSAA overlay compositing) to the compositor without importing gogpu directly. Enterprise pattern validated by Chromium cc/Skia, GTK4 GSK, Flutter flow/ source code.
+
 ## [0.26.0] - 2026-08-10
 
 ### Changed
