@@ -59,13 +59,139 @@ func TestModifiers(t *testing.T) {
 	}
 }
 
+func TestKeyGroupedBases(t *testing.T) {
+	tests := []struct {
+		name string
+		key  Key
+		want Key
+	}{
+		{"KeyUnknown", KeyUnknown, 0},
+		{"KeyA (letters base)", KeyA, 1},
+		{"KeyZ (letters end)", KeyZ, 26},
+		{"Key0 (digits base)", Key0, 33},
+		{"Key9 (digits end)", Key9, 42},
+		{"KeyF1 (function base)", KeyF1, 49},
+		{"KeyF12", KeyF12, 60},
+		{"KeyF13", KeyF13, 61},
+		{"KeyF24 (function end)", KeyF24, 72},
+		{"KeyEscape (navigation base)", KeyEscape, 81},
+		{"KeyDown (navigation end)", KeyDown, 95},
+		{"KeyLeftShift (modifiers base)", KeyLeftShift, 113},
+		{"KeyRightSuper (modifiers end)", KeyRightSuper, 120},
+		{"KeyMinus (punctuation base)", KeyMinus, 129},
+		{"KeyIntlYen (punctuation end)", KeyIntlYen, 141},
+		{"KeyNumpad0 (numpad base)", KeyNumpad0, 161},
+		{"KeyNumpadComma (numpad end)", KeyNumpadComma, 178},
+		{"KeyCapsLock (locks base)", KeyCapsLock, 193},
+		{"KeyPause (locks end)", KeyPause, 197},
+		{"KeyMediaPlayPause (media base)", KeyMediaPlayPause, 209},
+		{"KeyMediaRecord (media end)", KeyMediaRecord, 213},
+		{"KeyAudioVolumeUp (volume base)", KeyAudioVolumeUp, 241},
+		{"KeyAudioVolumeMute (volume end)", KeyAudioVolumeMute, 243},
+		{"KeyBrowserBack (browser base)", KeyBrowserBack, 249},
+		{"KeyBrowserSearch (browser end)", KeyBrowserSearch, 253},
+		{"KeyContextMenu (system base)", KeyContextMenu, 265},
+		{"KeyLaunchApp2 (system end)", KeyLaunchApp2, 268},
+	}
+	for _, tt := range tests {
+		if tt.key != tt.want {
+			t.Errorf("%s = %d, want %d", tt.name, tt.key, tt.want)
+		}
+	}
+}
+
+func TestKeyGroupsNoOverlap(t *testing.T) {
+	groups := []struct {
+		name     string
+		first    Key
+		last     Key
+		maxRange Key
+	}{
+		{"Letters", KeyA, KeyZ, 31},
+		{"Digits", Key0, Key9, 47},
+		{"Function", KeyF1, KeyF24, 80},
+		{"Navigation", KeyEscape, KeyDown, 112},
+		{"Modifiers", KeyLeftShift, KeyRightSuper, 128},
+		{"Punctuation", KeyMinus, KeyIntlYen, 160},
+		{"Numpad", KeyNumpad0, KeyNumpadComma, 192},
+		{"Locks", KeyCapsLock, KeyPause, 208},
+		{"Media", KeyMediaPlayPause, KeyMediaRecord, 240},
+		{"Volume", KeyAudioVolumeUp, KeyAudioVolumeMute, 248},
+		{"Browser", KeyBrowserBack, KeyBrowserSearch, 264},
+		{"System", KeyContextMenu, KeyLaunchApp2, 280},
+	}
+	for i, g := range groups {
+		if g.last > g.maxRange {
+			t.Errorf("%s: last key %d exceeds group max range %d", g.name, g.last, g.maxRange)
+		}
+		if i > 0 {
+			prev := groups[i-1]
+			if g.first <= prev.maxRange {
+				t.Errorf("%s (base %d) overlaps with %s (max %d)", g.name, g.first, prev.name, prev.maxRange)
+			}
+		}
+	}
+}
+
+func TestKeyStringRoundTrip(t *testing.T) {
+	keys := []Key{
+		KeyA, KeyZ, Key0, Key9, KeyF1, KeyF12, KeyF13, KeyF24,
+		KeyEscape, KeyEnter, KeySpace, KeyLeft, KeyDown,
+		KeyLeftShift, KeyRightSuper,
+		KeyMinus, KeySlash, KeyIntlBackslash, KeyIntlYen,
+		KeyNumpad0, KeyNumpadEnter, KeyNumpadEqual, KeyNumpadComma,
+		KeyCapsLock, KeyPause,
+		KeyMediaPlayPause, KeyMediaStop, KeyMediaTrackNext, KeyMediaTrackPrevious, KeyMediaRecord,
+		KeyAudioVolumeUp, KeyAudioVolumeDown, KeyAudioVolumeMute,
+		KeyBrowserBack, KeyBrowserSearch,
+		KeyContextMenu, KeyCancel, KeyLaunchApp1, KeyLaunchApp2,
+	}
+	for _, k := range keys {
+		name := k.String()
+		got, ok := KeyFromString(name)
+		if !ok {
+			t.Errorf("KeyFromString(%q) returned false for valid key %d", name, k)
+			continue
+		}
+		if got != k {
+			t.Errorf("KeyFromString(%q) = %d, want %d", name, got, k)
+		}
+	}
+}
+
+func TestKeyFromStringUnknown(t *testing.T) {
+	tests := []string{"", "nonexistent", "KEY_A", "keyA", "ArrowLeft"}
+	for _, name := range tests {
+		k, ok := KeyFromString(name)
+		if ok {
+			t.Errorf("KeyFromString(%q) = (%d, true), want (_, false)", name, k)
+		}
+		if k != KeyUnknown {
+			t.Errorf("KeyFromString(%q) = %d, want KeyUnknown (0)", name, k)
+		}
+	}
+}
+
+func TestKeyStringNotEmpty(t *testing.T) {
+	keys := []Key{
+		KeyA, KeyZ, Key0, Key9, KeyF1, KeyF24, KeyEscape,
+		KeyContextMenu, KeyCancel, KeyMediaPlayPause, KeyAudioVolumeMute,
+	}
+	for _, k := range keys {
+		if s := k.String(); s == "" {
+			t.Errorf("Key(%d).String() is empty", k)
+		}
+	}
+}
+
 func TestKeyConstants(t *testing.T) {
-	// Verify key codes are unique and sequential
 	keys := []Key{
 		KeyA, KeyB, KeyC, KeyZ,
 		Key0, Key1, Key9,
-		KeyF1, KeyF12,
+		KeyF1, KeyF12, KeyF13, KeyF24,
 		KeyEscape, KeyEnter, KeySpace,
+		KeyContextMenu, KeyCancel,
+		KeyMediaPlayPause, KeyAudioVolumeUp,
 	}
 
 	seen := make(map[Key]bool)
