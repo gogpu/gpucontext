@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.26.0] - 2026-08-10
+
+### Changed
+
+- **Key enum redesign** — flat `iota` (94 keys) replaced with **grouped explicit bases** (138 keys). Each group has its own `const` block with reserved gaps, following the `net/http` status code pattern. Adding keys within a group never shifts values in other groups — binary-stable for v1.0+.
+  - **New groups:** Media (5 keys), Volume (3), Browser (5), System (4)
+  - **Extended:** Function keys F13-F24 (12 new), Punctuation +IntlBackslash/IntlYen, Numpad +NumpadEqual/NumpadComma
+  - **New keys:** `KeyContextMenu`, `KeyCancel`, `KeyLaunchApp1`, `KeyLaunchApp2`, `KeyMediaPlayPause`, `KeyMediaStop`, `KeyMediaTrackNext`, `KeyMediaTrackPrevious`, `KeyMediaRecord`, `KeyAudioVolumeUp`, `KeyAudioVolumeDown`, `KeyAudioVolumeMute`, `KeyBrowserBack`, `KeyBrowserForward`, `KeyBrowserRefresh`, `KeyBrowserHome`, `KeyBrowserSearch`
+  - **Naming:** W3C UIEvents KeyboardEvent.code convention adapted to Go PascalCase
+  - **BREAKING:** Key numeric values changed (pre-v1.0, no external consumers store numeric values)
+
+### Added
+
+- **`KeyFromString`** function — thread-safe reverse lookup from string name to Key value. Enables W3C KeyboardEvent.code compatibility for browser/WASM platforms. Uses `sync.Once` initialization. Round-trips with `Key.String()`.
+- **`Key.String()`** method — covers all 138 keys with human-readable names
+
 ## [0.25.0] - 2026-08-09
 
 ### Added

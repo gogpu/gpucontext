@@ -123,6 +123,26 @@ linters:
 
   exclusions:
     rules:
+      # Key.String() — large switch is the standard Go pattern for enum stringers
+      # (same as net/http status codes, syscall signal names, etc.)
+      - path: events\.go
+        text: "cyclomatic complexity"
+        linters:
+          - gocyclo
+          - cyclop
+      - path: events\.go
+        text: "cognitive complexity"
+        linters:
+          - gocognit
+      - path: events\.go
+        text: "Function name: String"
+        linters:
+          - maintidx
+      - path: events\.go
+        text: "Function 'String'"
+        linters:
+          - funlen
+
       # Test files - allow more flexibility
       - path: _test\.go
         linters:
