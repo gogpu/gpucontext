@@ -27,6 +27,13 @@ func TestIMETextRangeUsesUTF8ByteOffsets(t *testing.T) {
 			}
 		})
 	}
+
+	if !(IMETextRange{Start: 1, End: 1}).Empty() {
+		t.Fatal("collapsed range should be empty")
+	}
+	if (IMETextRange{Start: 1, End: 4}).Empty() {
+		t.Fatal("non-collapsed range should not be empty")
+	}
 }
 
 func TestIMECompositionRanges(t *testing.T) {
@@ -78,6 +85,10 @@ func TestIMESurroundingTextSelection(t *testing.T) {
 	if got := surrounding.SelectionRange(); got != (IMETextRange{Start: 1, End: 6}) {
 		t.Fatalf("SelectionRange() = %+v", got)
 	}
+	surrounding.Cursor, surrounding.Anchor = 1, 6
+	if got := surrounding.SelectionRange(); got != (IMETextRange{Start: 1, End: 6}) {
+		t.Fatalf("forward SelectionRange() = %+v", got)
+	}
 
 	surrounding.Cursor = 3 // inside 你.
 	if surrounding.IsValid() {
@@ -86,11 +97,33 @@ func TestIMESurroundingTextSelection(t *testing.T) {
 }
 
 func TestContentPurposeString(t *testing.T) {
-	if got := ContentPurposeURL.String(); got != "URL" {
-		t.Fatalf("ContentPurposeURL.String() = %q, want URL", got)
+	tests := []struct {
+		purpose ContentPurpose
+		want    string
+	}{
+		{ContentPurposeNormal, "Normal"},
+		{ContentPurposeAlpha, "Alpha"},
+		{ContentPurposeDigits, "Digits"},
+		{ContentPurposeNumber, "Number"},
+		{ContentPurposePhone, "Phone"},
+		{ContentPurposeURL, "URL"},
+		{ContentPurposeEmail, "Email"},
+		{ContentPurposeName, "Name"},
+		{ContentPurposePassword, "Password"},
+		{ContentPurposePin, "Pin"},
+		{ContentPurposeDate, "Date"},
+		{ContentPurposeTime, "Time"},
+		{ContentPurposeDateTime, "DateTime"},
+		{ContentPurposeTerminal, "Terminal"},
+		{ContentPurposeChat, "Chat"},
+		{ContentPurpose(255), "Unknown"},
 	}
-	if got := ContentPurpose(255).String(); got != "Unknown" {
-		t.Fatalf("unknown ContentPurpose.String() = %q, want Unknown", got)
+	for _, tt := range tests {
+		t.Run(tt.want, func(t *testing.T) {
+			if got := tt.purpose.String(); got != tt.want {
+				t.Fatalf("ContentPurpose(%d).String() = %q, want %q", tt.purpose, got, tt.want)
+			}
+		})
 	}
 }
 
@@ -109,6 +142,15 @@ func TestContentHintFlags(t *testing.T) {
 	}
 	if ContentHintAutoCapitalize != ContentHintAutoCapitalization {
 		t.Fatal("browser spelling must remain an alias")
+	}
+	if got := ContentHintNone.String(); got != stringNone {
+		t.Fatalf("ContentHintNone.String() = %q, want %q", got, stringNone)
+	}
+	if ContentHintNone.Has(ContentHintNone) {
+		t.Fatal("ContentHintNone must not report a capability bit")
+	}
+	if got := ContentHint(1 << 15).String(); got != "Unknown" {
+		t.Fatalf("unknown ContentHint.String() = %q, want Unknown", got)
 	}
 }
 
