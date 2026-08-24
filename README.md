@@ -347,6 +347,16 @@ names := backends.Available() // ["vulkan", "software"]
 | [gogpu/wgpu](https://github.com/gogpu/wgpu) | Pure Go WebGPU implementation |
 | [born-ml/born](https://github.com/born-ml/born) | ML framework, implements & uses |
 
+## Star History
+
+<a href="https://starhistory.io">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.starhistory.io/png?repos=gogpu/gpucontext&style=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.starhistory.io/png?repos=gogpu/gpucontext&style=professional" />
+   <img alt="Star History Chart" src="https://api.starhistory.io/png?repos=gogpu/gpucontext" width="800" />
+ </picture>
+</a>
+
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
