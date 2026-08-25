@@ -105,13 +105,27 @@ type IMEState struct {
 	CompositionText string
 
 	// CursorPos is the cursor position within the composition text.
+	//
+	// This field is retained for compatibility with the original v1 contract.
+	// Versioned IME providers should also populate CursorBegin and CursorEnd;
+	// when the cursor is collapsed, CursorPos should equal CursorBegin.
 	CursorPos int
 
+	// CursorBegin is the first UTF-8 byte of the active cursor range within
+	// CompositionText. It is available to consumers using IMEContractVersion.
+	CursorBegin int
+
+	// CursorEnd is the first UTF-8 byte after the active cursor range within
+	// CompositionText. A collapsed cursor has CursorBegin == CursorEnd.
+	CursorEnd int
+
 	// SelectionStart is the start of the selection within the composition text.
-	// This is used for candidate selection in some IME systems.
+	// This is used for candidate selection in some IME systems. Versioned IME
+	// providers report it as a UTF-8 byte offset.
 	SelectionStart int
 
 	// SelectionEnd is the end of the selection within the composition text.
+	// Versioned IME providers report it as a UTF-8 byte offset.
 	SelectionEnd int
 }
 

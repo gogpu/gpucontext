@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Versioned IME contract (v2)** — additive `IMEControllerV2`,
+  `IMEEventSourceV2`, and `IMECapabilityProviderV2` interfaces. Existing
+  `EventSource` and `IMEController` implementations remain valid.
+- **IME payload/range types** — UTF-8 byte-offset composition and surrounding
+  text ranges, candidate cursor area, cancellation, and delete-surrounding
+  events.
+- **ContentPurpose/ContentHint** — cross-platform content type values and ten
+  advisory hint flags, plus capability discovery helpers.
+
 ## [0.28.0] - 2026-08-13
 
 ### Added

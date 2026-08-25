@@ -4,7 +4,8 @@
 // projects to enable GPU resource sharing without circular dependencies:
 //
 //   - DeviceProvider: Interface for providing GPU device and queue
-//   - EventSource: Interface for window/input events (keyboard, mouse)
+//   - EventSource: Interface for window/input events (keyboard, mouse, legacy IME)
+//   - IMEControllerV2/IMEEventSourceV2: Optional versioned IME contract
 //   - PointerEventSource: Interface for unified pointer events (W3C Level 3, mouse+touch+pen)
 //   - WindowProvider: Interface for window geometry, DPI, and redraw requests
 //   - PlatformProvider: Interface for clipboard, cursor, dark mode, accessibility

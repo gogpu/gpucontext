@@ -34,6 +34,7 @@ go get github.com/gogpu/gpucontext
 - **ScrollEventSource** — Scroll/wheel events with pixel/line/page modes
 - **Texture** — Minimal interface for GPU textures with TextureUpdater/TextureRegionUpdater/TextureDrawer/TextureCreator
 - **IME Support** — Input Method Editor for CJK languages (Chinese, Japanese, Korean)
+- **Versioned IME contract** — optional cursor ranges, surrounding text, content purpose/hints, cancellation, and capability discovery without changing existing implementors
 - **WindowChrome** — Custom window chrome for frameless windows (hit testing, minimize/maximize/close) + runtime fullscreen toggle
 - **Registry[T]** — Generic registry with priority-based backend selection
 - **WebGPU Interfaces** — Device, Queue, Adapter, Surface interfaces
@@ -198,6 +199,49 @@ func (input *TextInput) Focus(controller gpucontext.IMEController) {
     controller.SetIMEPosition(input.cursorX, input.cursorY)
 }
 ```
+
+#### Versioned IME extension
+
+The original `EventSource` and `IMEController` interfaces are kept intact. A
+host that supports the richer contract implements the optional `V2` interfaces
+and advertises the operations it can provide:
+
+```go
+if caps, ok := gpucontext.DiscoverIMECapabilities(app); ok {
+    if caps.Supports(gpucontext.IMECapabilityContentPurpose |
+        gpucontext.IMECapabilityContentHints) {
+        if controller, ok := app.(gpucontext.IMEControllerV2); ok {
+            controller.SetIMEContentType(
+                gpucontext.ContentPurposePassword,
+                gpucontext.ContentHintSensitiveData|gpucontext.ContentHintHiddenText,
+            )
+        }
+    }
+}
+
+if source, ok := app.(gpucontext.IMEEventSourceV2); ok {
+    source.OnIMECompositionUpdateV2(func(state gpucontext.IMEComposition) {
+        // CursorBegin/End and SelectionStart/End are half-open UTF-8 byte
+        // ranges into CompositionText (not rune or UTF-16 indexes).
+        // Check HasCursor before drawing a caret: -1,-1 hides it.
+        renderPreedit(state.CompositionText, state.CursorRange())
+    })
+    source.OnIMECanceled(func() { clearPreedit() })
+    source.OnIMEDeleteSurrounding(func(event gpucontext.IMEDeleteSurroundingEvent) {
+        // Before and After are UTF-8 byte counts around the current cursor.
+        deleteSurrounding(event.Before, event.After)
+    })
+}
+```
+
+`IMECursorArea` uses logical DIP relative to the window content area, matching
+`WindowProvider` and pointer callbacks. `IMESurroundingText.Cursor` and
+`Anchor` are UTF-8 byte offsets and preserve selection direction. Hosts must
+convert to native UTF-16 or protocol units at the platform boundary and must
+not expose surrounding text while IME is disabled. A provider may implement
+`IMEEventSourceV2`, `IMEControllerV2`, and `IMECapabilityProviderV2`
+independently; consumers should check capability bits rather than assuming a
+platform supports every operation.
 
 ### Texture Interface
 
