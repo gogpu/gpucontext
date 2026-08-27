@@ -25,7 +25,7 @@ go get github.com/gogpu/gpucontext
 
 ## Features
 
-- **DeviceProvider** — Interface for injecting GPU device and queue (typed, zero `any`)
+- **DeviceProvider** — Interface for injecting GPU device, queue, and feature queries (typed, zero `any`)
 - **WindowProvider** — Window geometry, DPI scale factor, and redraw requests
 - **PlatformProvider** — Clipboard, cursor, dark mode, and accessibility preferences
 - **CursorShape** — 12 standard cursor shapes (arrow, pointer, text, resize, etc.)

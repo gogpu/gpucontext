@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.29.0] - 2026-08-27
+
+### Added
+
+- **`DeviceProvider.Features()`** — returns `gputypes.Features` bitfield of optional device capabilities. Enables consumers (g3d, gg) to query features like `FeatureRayQuery` without importing wgpu directly. Returns 0 if implementation does not track features (backward compatible). Matches Rust wgpu `device.features()` pattern.
+
+### Changed
+
+- **deps:** gputypes v0.5.2 → v0.6.0 (ray tracing types)
+
 ## [0.28.0] - 2026-08-13
 
 ### Added

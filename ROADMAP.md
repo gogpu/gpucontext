@@ -4,20 +4,38 @@
 
 `gpucontext` is the shared foundation for the [gogpu](https://github.com/gogpu) ecosystem, providing interfaces and utilities for GPU resource sharing without circular dependencies.
 
-## Current: v0.18.0
+## Current: v0.29.0
 
-- SubpixelLayout on PlatformProvider (ADR-024, LCD/ClearType auto-detection)
-- AdapterInfo on DeviceProvider (ADR-020, render mode auto-selection)
-- WindowChrome.SetFullscreen / IsFullscreen (ADR-018, runtime fullscreen toggle)
-- CursorMode (Locked/Confined/Normal) for mouse grab / pointer lock
-- PointerEvent.DeltaX/DeltaY for relative mouse movement
-- WindowChrome interface for frameless window support
+- `DeviceProvider.Features()` — query device capabilities (FeatureRayQuery, etc.)
+- SurfaceCompositor interface (ADR-067)
+- MouseButton/Modifiers stringers
+- Key enum redesign (grouped explicit bases, binary-stable)
+- DamageSource registration (ADR-065)
+- SubpixelLayout on PlatformProvider (ADR-024)
+- AdapterInfo on DeviceProvider (ADR-020)
+- WindowChrome.SetFullscreen / IsFullscreen (ADR-018)
+- CursorMode (Locked/Confined/Normal) for mouse grab
 - WindowProvider, PlatformProvider, DeviceProvider, TextureUpdater, EventSource
-- Texture interfaces (multi-touch, pressure, radius)
-- W3C Pointer Events Level 3, Scroll events, Gesture events
-- IME support for CJK input
 
 ## Released
+
+### v0.29.0 (2026-08-27)
+- `DeviceProvider.Features()` — gputypes.Features bitfield for capability queries
+
+### v0.28.0 (2026-08-13)
+- MouseButton.String(), Modifiers.String()
+
+### v0.27.0 (2026-08-10)
+- SurfaceCompositor interface (ADR-067)
+
+### v0.26.0 (2026-08-10)
+- Key enum redesign (grouped explicit bases)
+
+### v0.24.0 (2026-07-21)
+- DamageSource registration (ADR-065)
+
+### v0.18.0 (2026-05-09)
+- SubpixelLayout on PlatformProvider
 
 ### v0.12.0 (2026-04-09)
 - CursorMode + PointerEvent DeltaX/DeltaY for mouse grab (gogpu#173)

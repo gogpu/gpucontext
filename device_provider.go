@@ -52,4 +52,10 @@ type DeviceProvider interface {
 	// prefer CPU rasterizer over GPU shader interpreter.
 	// Returns AdapterTypeUnknown if adapter info is not available.
 	AdapterInfo() AdapterInfo
+
+	// Features returns the set of optional features supported by this device.
+	// Consumers (e.g., g3d) can query capabilities like FeatureRayQuery
+	// without importing wgpu. Returns 0 if the implementation does not
+	// track features (backward compatible — treat as no optional features).
+	Features() gputypes.Features
 }
