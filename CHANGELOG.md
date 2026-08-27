@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **deps:** gputypes v0.5.2 (unchanged, Features already defined there)
+- **deps:** gputypes v0.5.2 → v0.6.0 (ray tracing types)
 
 ## [0.28.0] - 2026-08-13
 
