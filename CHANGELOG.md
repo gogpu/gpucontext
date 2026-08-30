@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.31.1] - 2026-08-30
+
+### Changed
+
+- **`TextureRegionUpdater.UpdateRegion` — struct API** (#484) — replaced six positional int parameters with `image.Rectangle` + `ImageDataLayout` (WebGPU / Go stdlib idiom). Fixes silent parameter-swap bugs. Zero-value layout = offset 0, tight packed rows, region height.
+
 ## [0.31.0] - 2026-08-30
 
 ### Changed
