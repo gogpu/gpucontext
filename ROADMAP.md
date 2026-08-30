@@ -4,9 +4,9 @@
 
 `gpucontext` is the shared foundation for the [gogpu](https://github.com/gogpu) ecosystem, providing interfaces and utilities for GPU resource sharing without circular dependencies.
 
-## Current: v0.31.0
+## Current: v0.31.2
 
-- `TextureRegionUpdater.UpdateRegion` strided upload (`bytesPerRow`, #484)
+- `TextureRegionUpdater.UpdateRegion` struct API (`image.Rectangle` + `ImageDataLayout`, #484)
 - `DeviceProvider.DownlevelCapabilities()` (ADR-071)
 - `DeviceProvider.Features()` — query device capabilities (FeatureRayQuery, etc.)
 - SurfaceCompositor interface (ADR-067)
@@ -20,6 +20,12 @@
 - WindowProvider, PlatformProvider, DeviceProvider, TextureUpdater, EventSource
 
 ## Released
+
+### v0.31.2 (2026-08-30)
+- docs: fix README and ROADMAP for struct-based UpdateRegion API
+
+### v0.31.1 (2026-08-30)
+- `TextureRegionUpdater.UpdateRegion` — struct API: `image.Rectangle` + `ImageDataLayout` (#484)
 
 ### v0.31.0 (2026-08-30)
 - `TextureRegionUpdater.UpdateRegion` — `bytesPerRow` parameter (pre-v1.0, #484)
