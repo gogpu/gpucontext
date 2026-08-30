@@ -232,9 +232,17 @@ type TextureUpdater interface {
     UpdateData(data []byte) error
 }
 
+// ImageDataLayout describes the memory layout of pixel data for region uploads.
+// Mirrors W3C GPUTexelCopyBufferLayout at the application level.
+type ImageDataLayout struct {
+    BytesPerRow  int // 0 = tight packed (w * bytesPerPixel)
+    RowsPerImage int // 0 = height (for 3D/array textures)
+    Offset       int // byte offset into data
+}
+
 // TextureRegionUpdater uploads only a sub-rectangle (partial upload)
 type TextureRegionUpdater interface {
-    UpdateRegion(x, y, w, h int, data []byte) error
+    UpdateRegion(region image.Rectangle, data []byte, layout ImageDataLayout) error
 }
 ```
 
