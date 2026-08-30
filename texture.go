@@ -45,11 +45,18 @@ type TextureRegionUpdater interface {
 	// UpdateRegion uploads a sub-rectangle of pixel data to the texture.
 	// x, y is the top-left corner of the region in the texture.
 	// w, h is the size of the region.
-	// data must be exactly w * h * bytesPerPixel bytes (densely packed RGBA rows).
+	// bytesPerRow is the stride in bytes between consecutive rows in data.
+	// Pass 0 for tightly packed rows (w * bytesPerPixel) — WebGPU
+	// ImageDataLayout.bytesPerRow semantics. This eliminates the need for
+	// callers to extractRegion-copy dirty bands from a full-frame buffer.
+	//
+	// When bytesPerRow is 0, data must be exactly w * h * bytesPerPixel bytes.
+	// When bytesPerRow > 0, data must be at least
+	// bytesPerRow*(h-1) + w*bytesPerPixel bytes (last row need not be padded).
 	//
 	// Returns error if the region exceeds texture bounds, data size is invalid,
-	// or the texture has been destroyed.
-	UpdateRegion(x, y, w, h int, data []byte) error
+	// bytesPerRow is too small, or the texture has been destroyed.
+	UpdateRegion(x, y, w, h, bytesPerRow int, data []byte) error
 }
 
 // TextureDrawer provides texture drawing capabilities for 2D rendering.
