@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.30.0] - 2026-08-30
+
+### Added
+
+- **`DeviceProvider.DownlevelCapabilities()`** — returns `gputypes.DownlevelCapabilities` for backend capability queries. Enables consumers (gg, g3d, Born ML) to check compute support, indirect execution, and other capabilities that may be absent on non-conformant backends (GLES 3.0, CPU software). Returns zero-value if implementation does not track downlevel capabilities (backward compatible). Matches Rust wgpu `Adapter::get_downlevel_capabilities()` pattern. Architecture: DeviceProvider interface method, not type-assert — follows Flutter Impeller "check capabilities, not backend type" principle. See ADR-071.
+
+### Changed
+
+- **deps:** gputypes v0.6.0 → v0.7.0 (DownlevelCapabilities types)
+
 ## [0.29.0] - 2026-08-27
 
 ### Added
