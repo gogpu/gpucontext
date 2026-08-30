@@ -58,4 +58,12 @@ type DeviceProvider interface {
 	// without importing wgpu. Returns 0 if the implementation does not
 	// track features (backward compatible — treat as no optional features).
 	Features() gputypes.Features
+
+	// DownlevelCapabilities returns backend capability flags for downlevel adapters.
+	// Consumers (e.g., gg) use this to query compute support, indirect execution,
+	// and other capabilities that may not be available on all backends (GLES 3.0).
+	// Returns zero-value DownlevelCapabilities if the implementation does not
+	// track downlevel capabilities (backward compatible — treat as no capabilities).
+	// Matches Rust wgpu Adapter::get_downlevel_capabilities() (adapter.rs:174).
+	DownlevelCapabilities() gputypes.DownlevelCapabilities
 }
