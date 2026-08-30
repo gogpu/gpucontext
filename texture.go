@@ -3,6 +3,8 @@
 
 package gpucontext
 
+import "image"
+
 // Texture is the minimal interface for GPU textures.
 // This interface enables type-safe cross-package texture handling
 // without circular dependencies.
@@ -35,6 +37,19 @@ type TextureUpdater interface {
 	UpdateData(data []byte) error
 }
 
+// ImageDataLayout describes the memory layout of pixel data for region uploads.
+// Mirrors W3C GPUTexelCopyBufferLayout at the application level.
+type ImageDataLayout struct {
+	// BytesPerRow is the stride in bytes between consecutive rows in data.
+	// Zero means tightly packed rows (region width * bytesPerPixel).
+	BytesPerRow int
+	// RowsPerImage is the height of the source image in rows. Zero defaults to
+	// the region height (2D textures).
+	RowsPerImage int
+	// Offset is the byte offset into data where pixel data begins.
+	Offset int
+}
+
 // TextureRegionUpdater uploads a sub-rectangle of pixel data to the texture.
 // Use for incremental rendering where only a small portion of the texture
 // changes per frame (e.g., dirty region upload).
@@ -42,21 +57,15 @@ type TextureUpdater interface {
 // Implementations:
 //   - gogpu.Texture implements TextureRegionUpdater
 type TextureRegionUpdater interface {
-	// UpdateRegion uploads a sub-rectangle of pixel data to the texture.
-	// x, y is the top-left corner of the region in the texture.
-	// w, h is the size of the region.
-	// bytesPerRow is the stride in bytes between consecutive rows in data.
-	// Pass 0 for tightly packed rows (w * bytesPerPixel) — WebGPU
-	// ImageDataLayout.bytesPerRow semantics. This eliminates the need for
-	// callers to extractRegion-copy dirty bands from a full-frame buffer.
+	// UpdateRegion uploads pixel data to region using stdlib image.Rectangle
+	// coordinates (Min = top-left, Max = exclusive bottom-right).
 	//
-	// When bytesPerRow is 0, data must be exactly w * h * bytesPerPixel bytes.
-	// When bytesPerRow > 0, data must be at least
-	// bytesPerRow*(h-1) + w*bytesPerPixel bytes (last row need not be padded).
+	// layout describes source buffer stride and offset. Zero value means
+	// offset 0, tightly packed rows, single image (region height).
 	//
 	// Returns error if the region exceeds texture bounds, data size is invalid,
-	// bytesPerRow is too small, or the texture has been destroyed.
-	UpdateRegion(x, y, w, h, bytesPerRow int, data []byte) error
+	// layout stride is too small, or the texture has been destroyed.
+	UpdateRegion(region image.Rectangle, data []byte, layout ImageDataLayout) error
 }
 
 // TextureDrawer provides texture drawing capabilities for 2D rendering.
