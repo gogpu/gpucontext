@@ -17,7 +17,7 @@
 
 ## Ecosystem
 
-- [GoGPU on GitHub](https://github.com/gogpu): all modules
+- [GoGPU ecosystem](https://gogpu.dev/llms.txt): map of all modules
 - [gputypes](https://pkg.go.dev/github.com/gogpu/gputypes): the WebGPU types these interfaces use
 - [gogpu](https://pkg.go.dev/github.com/gogpu/gogpu): the app framework that implements the providers
 - [Open Collective](https://opencollective.com/gogpu): support development
