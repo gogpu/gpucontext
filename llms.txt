@@ -1,21 +1,23 @@
-# gpucontext — Shared GPU Interfaces for GoGPU
+# gpucontext
 
-> Cross-package contract for GPU resource sharing. Interfaces and opaque handle types used by all GoGPU ecosystem packages.
+> gpucontext holds the shared interfaces of the GoGPU ecosystem. Packages that share one GPU device and one window (gogpu creates them; gg, ui and g3d use them) agree on these interfaces, so none of them imports the others. It defines DeviceProvider (device, queue, surface format, adapter and adapter info, features, downlevel capabilities), WindowProvider and PlatformProvider (size, scale, redraw, clipboard, cursor, preferences), WindowChrome for frameless windows, input event sources (keyboard, IME, W3C pointer events, scroll, gestures), texture interfaces (create, update, draw), the damage and debug-overlay contracts, opaque handles (TextureView, CommandEncoder) and a generic priority Registry. It depends only on gputypes and has no GPU backend of its own. Pure Go, zero CGO, Go 1.25+. Pre-1.0: interfaces may change before v1.0.
 
 ## Docs
 
-- [gpucontext API](https://pkg.go.dev/github.com/gogpu/gpucontext): DeviceProvider, EventSource, WindowProvider, PlatformProvider, opaque handles
-- [AGENTS.md](https://github.com/gogpu/gpucontext/blob/main/AGENTS.md): AI agent instructions for this package
+- [API reference](https://pkg.go.dev/github.com/gogpu/gpucontext): every interface with its contract
+- [README](https://github.com/gogpu/gpucontext/blob/main/README.md): features, usage, dependency graph
+- [AGENTS.md](https://github.com/gogpu/gpucontext/blob/main/AGENTS.md): instructions for AI agents using gpucontext
+- [CHANGELOG](https://github.com/gogpu/gpucontext/blob/main/CHANGELOG.md)
+- [ROADMAP](https://github.com/gogpu/gpucontext/blob/main/ROADMAP.md)
+
+## Examples
+
+- [README usage](https://github.com/gogpu/gpucontext/blob/main/README.md#usage): implementing and consuming DeviceProvider and the event sources
+- [gogpu deviceprovider example](https://github.com/gogpu/gogpu/tree/main/examples/deviceprovider): an app handing its device to another package
 
 ## Ecosystem
 
-- [GoGPU Ecosystem](https://github.com/gogpu/gogpu/blob/main/AGENTS.md): Full ecosystem map and instructions
-- [gogpu](https://pkg.go.dev/github.com/gogpu/gogpu): App framework (implements DeviceProvider)
-- [wgpu](https://pkg.go.dev/github.com/gogpu/wgpu): WebGPU implementation (handle helpers)
-- [gg](https://pkg.go.dev/github.com/gogpu/gg): 2D graphics (consumes DeviceProvider)
-- [ui](https://pkg.go.dev/github.com/gogpu/ui): GUI toolkit (consumes EventSource, WindowProvider)
-
-## Community
-
-- [GitHub](https://github.com/gogpu/gpucontext)
-- [Open Collective](https://opencollective.com/gogpu)
+- [GoGPU on GitHub](https://github.com/gogpu): all modules
+- [gputypes](https://pkg.go.dev/github.com/gogpu/gputypes): the WebGPU types these interfaces use
+- [gogpu](https://pkg.go.dev/github.com/gogpu/gogpu): the app framework that implements the providers
+- [Open Collective](https://opencollective.com/gogpu): support development
