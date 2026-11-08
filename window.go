@@ -38,6 +38,10 @@ type WindowProvider interface {
 	// RequestRedraw requests the host to render a new frame.
 	// In on-demand rendering mode, this triggers a single frame render.
 	// In continuous mode, this is a no-op.
+	//
+	// It must be safe to call from any goroutine, including while the host is
+	// rendering (animation drivers call it from their own goroutines), and
+	// repeated requests before the next frame coalesce into one.
 	RequestRedraw()
 }
 
