@@ -171,7 +171,9 @@ func (app *App) OnKeyPress(fn func(gpucontext.Key, gpucontext.Modifiers)) {
 
 ### IME Support (CJK Input)
 
-`IMEState` and related interfaces enable Input Method Editor support for Chinese, Japanese, and Korean input:
+`IMEState`, `IMEController` and the optional `IMEEventSource` enable Input Method Editor support for Chinese,
+Japanese, Korean and other complex input. All text positions are UTF-8 byte offsets (`IMETextRange`), as in
+Wayland text-input, GTK4 and winit:
 
 ```go
 // In gogpu/ui - handle IME composition
@@ -181,8 +183,8 @@ func (input *TextInput) AttachIME(source gpucontext.EventSource) {
     })
 
     source.OnIMECompositionUpdate(func(state gpucontext.IMEState) {
-        // Show composition text with cursor
-        input.setCompositionText(state.CompositionText, state.CursorPos)
+        // Composition text with its cursor (UTF-8 byte range; hidden when the IME asks)
+        input.setCompositionText(state.CompositionText, state.Cursor, state.HasCursor())
     })
 
     source.OnIMECompositionEnd(func(committed string) {
@@ -190,12 +192,21 @@ func (input *TextInput) AttachIME(source gpucontext.EventSource) {
         input.insertText(committed)
         input.hideCompositionWindow()
     })
+
+    // Optional events, found by type assertion
+    if ime, ok := source.(gpucontext.IMEEventSource); ok {
+        ime.OnIMECanceled(input.clearComposition)
+        ime.OnIMEDeleteSurrounding(input.deleteAroundCursor)
+    }
 }
 
-// Control IME position (for composition window placement)
+// Enable IME and tell it where the caret is and what the field expects
 func (input *TextInput) Focus(controller gpucontext.IMEController) {
     controller.SetIMEEnabled(true)
-    controller.SetIMEPosition(input.cursorX, input.cursorY)
+    controller.SetIMECursorArea(gpucontext.IMECursorArea{X: input.caretX, Y: input.caretY, Height: input.lineHeight})
+    if controller.IMECapabilities().Has(gpucontext.IMECapabilityContentType) {
+        controller.SetIMEContentType(gpucontext.ContentPurposeEmail, gpucontext.ContentHintCompletion)
+    }
 }
 ```
 

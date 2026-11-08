@@ -53,8 +53,9 @@
 package gpucontext
 
 const (
-	stringNone   = "None"
-	stringLeft   = "Left"
-	stringRight  = "Right"
-	stringMiddle = "Middle"
+	stringNone    = "None"
+	stringUnknown = "Unknown"
+	stringLeft    = "Left"
+	stringRight   = "Right"
+	stringMiddle  = "Middle"
 )
