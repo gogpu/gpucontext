@@ -90,44 +90,6 @@ type EventSource interface {
 	OnIMECompositionEnd(fn func(committed string))
 }
 
-// IMEState represents the current state of the Input Method Editor.
-// This is used for CJK (Chinese, Japanese, Korean) and other complex text input.
-//
-// During IME composition, the user types phonetic characters that are converted
-// to ideographic characters. The IMEState contains the current preview text
-// and cursor information for rendering the composition inline.
-type IMEState struct {
-	// Composing indicates whether IME is currently in composition mode.
-	Composing bool
-
-	// CompositionText is the text currently being composed (e.g., pinyin for Chinese).
-	// This should be displayed inline at the cursor position with special styling.
-	CompositionText string
-
-	// CursorPos is the cursor position within the composition text.
-	CursorPos int
-
-	// SelectionStart is the start of the selection within the composition text.
-	// This is used for candidate selection in some IME systems.
-	SelectionStart int
-
-	// SelectionEnd is the end of the selection within the composition text.
-	SelectionEnd int
-}
-
-// IMEController allows widgets to control IME behavior.
-// This interface is typically implemented by the host window system.
-type IMEController interface {
-	// SetIMEPosition tells the platform where to show the IME candidate window.
-	// The coordinates are in screen pixels relative to the window.
-	SetIMEPosition(x, y int)
-
-	// SetIMEEnabled enables or disables IME for the current input context.
-	// When disabled, key presses are delivered directly without IME processing.
-	// This is useful for password fields or non-text inputs.
-	SetIMEEnabled(enabled bool)
-}
-
 // Key represents a keyboard key.
 //
 // Values use grouped ranges with explicit base offsets (the net/http pattern).

@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed (breaking)
+
+- **IME contract (ADR-045)**, based on gpucontext#30 by @besmpl. One extended `IMEController` instead of versioned
+  interfaces; all text positions are UTF-8 byte offsets.
+  - `IMEController`: `SetIMEPosition(x, y int)` is replaced by `SetIMECursorArea(IMECursorArea)` (logical DIP).
+    New methods: `SetIMEContentType`, `SetIMESurroundingText`, `CancelIME`, `IMECapabilities`. Every method must
+    be safe from any goroutine.
+  - `IMEState`: `CursorPos`, `SelectionStart` and `SelectionEnd` are replaced by `Cursor` and `Selection`
+    (`IMETextRange`). A `{-1, -1}` cursor means the IME hides it (`HasCursor`).
+  - Migration: hosts implement the new methods. Methods for unsupported operations are no-ops, and
+    `IMECapabilities` reports what the platform does. Consumers read `state.Cursor.Start` where they read
+    `state.CursorPos`.
+
+### Added
+
+- `IMETextRange`, `IMESurroundingText`, `IMECursorArea`, `IMEDeleteSurroundingEvent`, with UTF-8 validation that
+  never clamps.
+- `ContentPurpose` (incl. `Chat`) and the `ContentHint` bitset, with names from tables keyed by the constants.
+- `IMECapabilities` in three groups, as in winit: cursor area, content type, surrounding text.
+- Optional `IMEEventSource` (`OnIMECanceled`, `OnIMEDisabled`, `OnIMEDeleteSurrounding`), found by type assertion.
+
+### Documentation
+
+- `WindowProvider.RequestRedraw` must be safe to call from any goroutine, and requests coalesce.
+
 ## [0.31.3] - 2026-08-31
 
 ### Changed
