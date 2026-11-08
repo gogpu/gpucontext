@@ -4,8 +4,10 @@
 
 `gpucontext` is the shared foundation for the [gogpu](https://github.com/gogpu) ecosystem, providing interfaces and utilities for GPU resource sharing without circular dependencies.
 
-## Current: v0.31.2
+## Current: v0.32.0
 
+- IME contract (ADR-045): one `IMEController` (cursor area, content type, surrounding text, cancel,
+  capabilities), `IMEState` with UTF-8 byte ranges, optional `IMEEventSource`
 - `TextureRegionUpdater.UpdateRegion` struct API (`image.Rectangle` + `ImageDataLayout`, #484)
 - `DeviceProvider.DownlevelCapabilities()` (ADR-071)
 - `DeviceProvider.Features()` — query device capabilities (FeatureRayQuery, etc.)
@@ -20,6 +22,14 @@
 - WindowProvider, PlatformProvider, DeviceProvider, TextureUpdater, EventSource
 
 ## Released
+
+### v0.32.0 (2026-11-08)
+- IME contract per ADR-045 (breaking: `SetIMEPosition` → `SetIMECursorArea`, `IMEState` cursor fields → ranges),
+  based on gpucontext#30 by @besmpl
+- docs: `WindowProvider.RequestRedraw` is safe from any goroutine
+
+### v0.31.3 (2026-08-31)
+- deps: gputypes v0.8.0 (ADR-072 struct params)
 
 ### v0.31.2 (2026-08-30)
 - docs: fix README and ROADMAP for struct-based UpdateRegion API

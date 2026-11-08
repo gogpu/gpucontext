@@ -41,7 +41,22 @@ type EventSource interface {
     OnMouseMove(func(x, y float64))
     // ... 12 methods total
 }
+
+// IME (ADR-045): positions are UTF-8 byte offsets (IMETextRange).
+type IMEController interface {           // implemented by the host window system
+    SetIMEEnabled(bool)
+    SetIMECursorArea(IMECursorArea)       // logical DIP
+    SetIMEContentType(ContentPurpose, ContentHint)
+    SetIMESurroundingText(IMESurroundingText)
+    CancelIME()
+    IMECapabilities() IMECapabilities     // which optional operations the platform performs
+}
+// Optional events: if ime, ok := source.(IMEEventSource); ok { ime.OnIMECanceled(...) }
 ```
+
+IME composition arrives through EventSource's OnIMECompositionStart/Update/End; `IMEState.Cursor` is
+`{-1, -1}` when the IME hides the caret (`HasCursor`). Every IMEController method and `RequestRedraw` are safe from
+any goroutine.
 
 ### Opaque Handles (8 bytes, zero alloc, GC-safe)
 
