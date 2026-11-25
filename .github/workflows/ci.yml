@@ -2,7 +2,7 @@ name: CI
 
 # CI Strategy:
 # - Tests run on Linux, macOS, and Windows (cross-platform shared interfaces)
-# - Go 1.25+ required (matches go.mod requirement)
+# - Go 1.27+ required (matches go.mod requirement; the go line follows the support window N/N-1)
 # - Pure Go: zero external dependencies (only gputypes)
 #
 # Branch Strategy (GitHub Flow):
@@ -18,6 +18,12 @@ on:
     branches:
       - main
 
+# Every job builds with the toolchain setup-go installs, never a downloaded one:
+# the go line is the floor under test here, and an implicit toolchain switch would
+# hide a failure to build at that floor.
+env:
+  GOTOOLCHAIN: local
+
 jobs:
   # Build verification - Cross-platform
   build:
@@ -26,7 +32,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        go-version: ['1.25']
+        go-version: ['1.27']
 
     steps:
     - name: Checkout code
@@ -54,7 +60,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        go-version: ['1.25']
+        go-version: ['1.27']
 
     steps:
     - name: Checkout code
@@ -98,7 +104,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.25'
+        go-version: '1.27'
         cache: true
 
     - name: Run golangci-lint
@@ -119,7 +125,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.25'
+        go-version: '1.27'
         cache: true
 
     - name: Check formatting
@@ -146,7 +152,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.25'
+        go-version: '1.27'
         cache: true
 
     - name: Install go-mod-outdated
