@@ -21,7 +21,7 @@ gpucontext imports gputypes to use shared types in interface signatures, ensurin
 go get github.com/gogpu/gpucontext
 ```
 
-**Requires:** Go 1.25+
+**Requires:** Go 1.27+
 
 ## Features
 

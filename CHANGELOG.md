@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Go floor raised to 1.27** (`go.mod` `go 1.27.0`). The go line follows the support window N/N−1: 1.25 has reached
+  end of life. CI now builds and tests on a single 1.27 matrix with `GOTOOLCHAIN=local` in every job, so the floor
+  is what is actually built; the oldstable legs are dropped because a local toolchain cannot build a module whose go
+  line is newer. PATCH-level: a go-line raise is not a version event of its own.
 - **Dependencies: gputypes v0.8.2 → v0.9.2.** The gputypes types this module exposes (`DownlevelCapabilities`,
   `Features`, `TextureFormat`) keep their shapes — the public API golden regenerates with zero diff (1 package /
   346 identifiers) — so this is a dependency update only. Consumers are lifted to gputypes ≥ v0.9.2 by Go's
